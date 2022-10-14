@@ -389,7 +389,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         public static List<Status> GetStatus()
         {
-            var spOption = 2;
+            var spOption = 3;
             List<Status> status = new List<Status>();
             using (var bl = new Business())
             {
@@ -461,6 +461,114 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
 
         #region STOPs
+
+        public static Result StoreStop(StopsPost _obj)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@Stop_Number", _obj.Stop_Number)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[StopsProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result UpdateStop(StopsPut stopsPut)
+        {
+            Result result = new Result();
+            var spOption = 2;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                        .AddParam("@Stop_Id", stopsPut.Stop_Id)
+                        .AddParam("@Stop_Number", stopsPut.Stop_Number)
+                        .AddParam("@User_Logged", stopsPut.User_Logged)
+                        .AddParam("@StatusOut", DBNull.Value, true, 100)
+                        .AddParam("@MessageOut", DBNull.Value, true, 300)
+                        .AddParam("@SPOption", spOption)
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[StopsProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<Stops> GetStops()
+        {
+            var spOption = 3;
+            List<Stops> stops = new List<Stops>();
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[StopsProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        stops = new List<Stops>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            stops.Add(new Stops()
+                            {
+                                Stop_Id = Convert.ToInt32(item["Stop_Id"]),
+                                Stop_Number = Convert.ToInt32(item["Stop_Number"]),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return stops;
+        }
 
         #endregion
 
