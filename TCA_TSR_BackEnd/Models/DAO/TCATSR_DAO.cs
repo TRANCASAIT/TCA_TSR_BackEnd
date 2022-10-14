@@ -248,7 +248,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 {
                     bl
                       .AddParam("@SpOption", spOption)
-                      .AddParam("UserType_Name", _obj.UserType_Name)
+                      .AddParam("@UserType_Name", _obj.UserType_Name)
                       .AddParam("@User_Logged", _obj.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
@@ -467,7 +467,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #region OperationType
 
-        public static Result StoreOperationType(UserTypePost _obj)
+        public static Result StoreOperationType(OperationTypePost _obj)
         {
             Result result = new Result();
             int spOption = 1;
@@ -477,11 +477,11 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 {
                     bl
                       .AddParam("@SpOption", spOption)
-                      .AddParam("UserType_Name", _obj.UserType_Name)
+                      .AddParam("@OperationType_Name", _obj.OperationType_Name)
                       .AddParam("@User_Logged", _obj.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
-                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]");
 
                     if (bl.Exception != null)
                     {
@@ -504,7 +504,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-        public static Result UpdateOperationType(UserTypePut _obj)
+        public static Result UpdateOperationType(OperationTypePut _obj)
         {
             Result result = new Result();
             var spOption = 2;
@@ -513,13 +513,13 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 try
                 {
                     bl
-                        .AddParam("@UserType_Id", _obj.UserType_Id)
-                        .AddParam("@UserType_Name", _obj.UserType_Name)
+                        .AddParam("@OperationType_Id", _obj.OperationType_Id)
+                        .AddParam("@OperationType_Name", _obj.OperationType_Name)
                         .AddParam("@User_Logged", _obj.User_Logged)
                         .AddParam("@StatusOut", DBNull.Value, true, 100)
                         .AddParam("@MessageOut", DBNull.Value, true, 300)
                         .AddParam("@SPOption", spOption)
-                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]");
 
                     if (bl.Exception != null)
                     {
@@ -542,25 +542,25 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-        public static List<UserType> GetOperationTypes()
+        public static List<OperationType> GetOperationTypes()
         {
             var spOption = 3;
-            List<UserType> userTypes = new List<UserType>();
+            List<OperationType> operationTypes = new List<OperationType>();
             using (var bl = new Business())
             {
                 try
                 {
                     DataTable dt = bl.AddParam("@SPOption", spOption)
-                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]");
                     if (dt.Rows.Count > 0)
                     {
-                        userTypes = new List<UserType>();
+                        operationTypes = new List<OperationType>();
                         foreach (DataRow item in dt.Rows)
                         {
-                            userTypes.Add(new UserType()
+                            operationTypes.Add(new OperationType()
                             {
-                                UserType_Id = Convert.ToInt32(item["UserType_Id"]),
-                                UserType_Name = item["UserType_Name"].ToString(),
+                                OperationType_Id = Convert.ToInt32(item["OperationType_Id"]),
+                                OperationType_Name = item["OperationType_Name"].ToString(),
                                 Creation_Date = item["Creation_Date"].ToString()
                             });
                         }
@@ -572,7 +572,35 @@ namespace TCA_TSR_BackEnd.Models.DAO
                     throw;
                 }
             }
-            return userTypes;
+            return operationTypes;
+        }
+
+        public static Result UpdateOperationTypeStatus(OperationTypePutState operationTypePutState)
+        {
+            Result result = new Result();
+            var spOption = 4;
+            using(var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@OperationType_Id",operationTypePutState.OperationType_Id)
+                      .AddParam("@Status",operationTypePutState.Status)
+                      .AddParam("@User_Logger",operationTypePutState.User_Logged)
+                      .AddParam("@SPOption",spOption)
+                      .AddParam("@StatusOut",DBNull.Value, true, 100)
+                      .AddParam("@MessageOut",DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]")
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                    result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    
+                }
+            }
+            return result;
         }
 
         #endregion
