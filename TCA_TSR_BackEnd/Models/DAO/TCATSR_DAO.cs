@@ -238,6 +238,113 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #region UserType
 
+        public static Result StoreUserType(UserTypePost _obj)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("UserType_Name", _obj.UserType_Name)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result UpdateUserType(UserTypePut _obj)
+        {
+            Result result = new Result();
+            var spOption = 2;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                        .AddParam("@UserType_Id", _obj.UserType_Id)
+                        .AddParam("@UserType_Name", _obj.UserType_Name)
+                        .AddParam("@User_Logged", _obj.User_Logged)
+                        .AddParam("@StatusOut", DBNull.Value, true, 100)
+                        .AddParam("@MessageOut", DBNull.Value, true, 300)
+                        .AddParam("@SPOption", spOption)
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<UserType> GetUserTypes()
+        {
+            var spOption = 3;
+            List<UserType> userTypes = new List<UserType>();
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        userTypes = new List<UserType>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            userTypes.Add(new UserType()
+                            {
+                                UserType_Id = Convert.ToInt32(item["UserType_Id"]),
+                                UserType_Name = item["UserType_Name"].ToString(),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return userTypes;
+        }
 
         #endregion
 
@@ -359,6 +466,114 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
 
         #region OperationType
+
+        public static Result StoreOperationType(UserTypePost _obj)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("UserType_Name", _obj.UserType_Name)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result UpdateOperationType(UserTypePut _obj)
+        {
+            Result result = new Result();
+            var spOption = 2;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                        .AddParam("@UserType_Id", _obj.UserType_Id)
+                        .AddParam("@UserType_Name", _obj.UserType_Name)
+                        .AddParam("@User_Logged", _obj.User_Logged)
+                        .AddParam("@StatusOut", DBNull.Value, true, 100)
+                        .AddParam("@MessageOut", DBNull.Value, true, 300)
+                        .AddParam("@SPOption", spOption)
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<UserType> GetOperationTypes()
+        {
+            var spOption = 3;
+            List<UserType> userTypes = new List<UserType>();
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserTypeProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        userTypes = new List<UserType>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            userTypes.Add(new UserType()
+                            {
+                                UserType_Id = Convert.ToInt32(item["UserType_Id"]),
+                                UserType_Name = item["UserType_Name"].ToString(),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return userTypes;
+        }
 
         #endregion
 
