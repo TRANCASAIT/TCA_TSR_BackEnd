@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using TCA_TSR_BackEnd.Models;
+using TCA_TSR_BackEnd.Models.DAO;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -10,34 +10,56 @@ namespace TCA_TSR_BackEnd.Controllers
     {
         // GET: api/<StatesController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult GetStates()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<StatesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            List<State> states = TCATSR_DAO.GetStates();
+            if(states != null)
+            {
+                return Ok(states);
+            }
+            else
+            {
+                Result result = new Result();
+                result.NumberRecords = 0;
+                return Ok(result);
+            }
         }
 
         // POST api/<StatesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] StatePost _state)
         {
+            Result result = new Result();
+            if(_state.State_Name.Length > 0 && _state.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.StoreState(_state);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
         }
 
         // PUT api/<StatesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult UpdateState([FromBody] StatePut statePut)
         {
+            Result result = new Result();
+            if(statePut.State_Id > 0 && statePut.State_Name.Length > 0 && statePut.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.UpdateState(statePut);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
         }
 
-        // DELETE api/<StatesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

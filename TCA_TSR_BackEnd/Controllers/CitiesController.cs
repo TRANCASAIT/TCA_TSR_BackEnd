@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using TCA_TSR_BackEnd.Models;
+using TCA_TSR_BackEnd.Models.DAO;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -10,34 +10,56 @@ namespace TCA_TSR_BackEnd.Controllers
     {
         // GET: api/<CitiesController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<CitiesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            Result result = new Result();
+            List<City> cities = TCATSR_DAO.GetCities();
+            if(cities != null)
+            {
+                return Ok(cities);
+            }
+            else
+            {
+                result.NumberRecords = 0;
+                result.State = 1;
+                return Ok(result);
+            }
         }
 
         // POST api/<CitiesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] CityPost cityPost)
         {
+            Result result = new Result();
+            if(cityPost.City_Name.Length > 0 && cityPost.User_Logged.Length > 0 && cityPost.State_Id > 0)
+            {
+                result = TCATSR_DAO.StoreCity(cityPost);
+                return Ok(cityPost);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
         }
 
         // PUT api/<CitiesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put([FromBody] CityPut cityPut)
         {
-        }
-
-        // DELETE api/<CitiesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            Result result = new Result();
+            if (cityPut.City_Name.Length > 0 && cityPut.User_Logged.Length > 0 && cityPut.State_Id > 0 && cityPut.City_Id > 0)
+            {
+                result = TCATSR_DAO.UpdateCity(cityPut);
+                return Ok(cityPut);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
         }
     }
 }

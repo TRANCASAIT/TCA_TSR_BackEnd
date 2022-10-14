@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using TCA_TSR_BackEnd.Models;
+using TCA_TSR_BackEnd.Models.DAO;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -10,34 +10,56 @@ namespace TCA_TSR_BackEnd.Controllers
     {
         // GET: api/<CustomerTypesController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<CustomerTypesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            Result result = new Result();
+            List<CustomerType> customerTypes = TCATSR_DAO.GetCustomerTypes();
+            if(customerTypes != null)
+            {
+                return Ok(customerTypes);
+            }
+            else
+            {
+                result.State = 1;
+                result.NumberRecords = 0;
+                return Ok(result);
+            }
         }
 
         // POST api/<CustomerTypesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] CustomerTypePost customer)
         {
+            Result result = new Result();
+            if(customer.CustomerType_Name.Length > 0 && customer.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.StoreCustomerType(customer);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
         }
 
         // PUT api/<CustomerTypesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put([FromBody] CustomerTypePut customerTypePut)
         {
-        }
-
-        // DELETE api/<CustomerTypesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            Result result = new Result();
+            if(customerTypePut.CustomerType_Name.Length > 0 && customerTypePut.CustomerType_Id > 0 && customerTypePut.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.UpdateCustomerType(customerTypePut);
+                return Ok(result);
+            }
+            else
+            {
+                result.Message = "Verifique los datos";
+                result.State = 1;
+                return Ok(result);
+            }
         }
     }
 }

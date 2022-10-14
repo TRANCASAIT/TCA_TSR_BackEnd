@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using TCA_TSR_BackEnd.Models;
+using TCA_TSR_BackEnd.Models.DAO;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -10,34 +10,56 @@ namespace TCA_TSR_BackEnd.Controllers
     {
         // GET: api/<OperationTypesController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "value1", "value2" };
+            List<OperationType> operationTypes = TCATSR_DAO.GetOperationTypes();
+            if(operationTypes != null)
+            {
+                return Ok(operationTypes);
+            }
+            else
+            {
+                Result result = new Result();
+                result.NumberRecords = 0;
+                return Ok(result);
+            }
         }
 
-        // GET api/<OperationTypesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
 
         // POST api/<OperationTypesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] OperationTypePost operationTypePost)
         {
+            Result result = new Result();
+            if(operationTypePost.OperationType_Name.Length > 0 && operationTypePost.User_Logged.Length > 0 )
+            {
+                result = TCATSR_DAO.StoreOperationType(operationTypePost);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
         }
 
         // PUT api/<OperationTypesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put([FromBody] OperationTypePut operationTypePut)
         {
-        }
-
-        // DELETE api/<OperationTypesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            Result result = new Result();
+            if (operationTypePut.OperationType_Id > 0 && operationTypePut.OperationType_Name.Length > 0 && operationTypePut.User_Logged.Length > 0 )
+            {
+                result = TCATSR_DAO.UpdateOperationType(operationTypePut);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
         }
     }
 }

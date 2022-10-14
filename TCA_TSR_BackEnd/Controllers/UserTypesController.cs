@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using TCA_TSR_BackEnd.Models;
+using TCA_TSR_BackEnd.Models.DAO;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -10,34 +10,57 @@ namespace TCA_TSR_BackEnd.Controllers
     {
         // GET: api/<UserTypesController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<UserTypesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            Result result = new Result();
+            List<UserType> userTypes = TCATSR_DAO.GetUserTypes();
+            if(userTypes != null)
+            {
+                return Ok(userTypes);
+            }
+            else
+            {
+                result.NumberRecords = 0;
+                result.State = 1;
+                return Ok(result);
+            }
         }
 
         // POST api/<UserTypesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] UserTypePost userTypePost)
         {
+            Result result = new Result();
+            if(userTypePost.UserType_Name.Length > 0 && userTypePost.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.StoreUserType(userTypePost);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
+
         }
 
         // PUT api/<UserTypesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put([FromBody] UserTypePut userTypePut)
         {
-        }
-
-        // DELETE api/<UserTypesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            Result result = new Result();
+            if(userTypePut.UserType_Name.Length > 0 && userTypePut.User_Logged.Length > 0 && userTypePut.UserType_Id > 0)
+            {
+                result = TCATSR_DAO.UpdateUserType(userTypePut);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
         }
     }
 }
