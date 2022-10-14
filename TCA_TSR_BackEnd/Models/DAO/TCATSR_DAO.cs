@@ -119,6 +119,117 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
 
         #region City
+        public static Result StoreCity(CityPost _obj)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@Ciy_Name", _obj.City_Name)
+                      .AddParam("@State_Id", _obj.State_Id)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CityProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result UpdateCity(CityPut _obj)
+        {
+            Result result = new Result();
+            var spOption = 2;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                        .AddParam("@City_Id", _obj.City_Id)
+                        .AddParam("@City_Name", _obj.City_Name)
+                        .AddParam("@State_Id", _obj.State_Id)
+                        .AddParam("@User_Logged", _obj.User_Logged)
+                        .AddParam("@StatusOut", DBNull.Value, true, 100)
+                        .AddParam("@MessageOut", DBNull.Value, true, 300)
+                        .AddParam("@SPOption", spOption)
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CityProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<City> GetCities()
+        {
+            var spOption = 3;
+            List<City> cities = new List<City>();
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CityProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        cities = new List<City>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            cities.Add(new City()
+                            {
+                                City_Id = Convert.ToInt32(item["City_Id"]),
+                                State_Id = Convert.ToInt32(item["State_Id"]),
+                                City_Name = item["City_Name"].ToString(),
+                                State_Name = item["State_Name"].ToString(),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return cities;
+        }
 
 
         #endregion
