@@ -11,7 +11,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         {
             Result result = new Result();
             int spOption = 1;
-            using(var bl = new Business())
+            using (var bl = new Business())
             {
                 try
                 {
@@ -86,16 +86,16 @@ namespace TCA_TSR_BackEnd.Models.DAO
         {
             var spOption = 3;
             List<State> states = new List<State>();
-            using(var bl = new Business())
+            using (var bl = new Business())
             {
                 try
                 {
                     DataTable dt = bl.AddParam("@SPOption", spOption)
                         .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[StateProcedures]");
-                    if(dt.Rows.Count > 0)
+                    if (dt.Rows.Count > 0)
                     {
                         states = new List<State>();
-                        foreach(DataRow item in dt.Rows)
+                        foreach (DataRow item in dt.Rows)
                         {
                             states.Add(new State()
                             {
@@ -798,25 +798,25 @@ namespace TCA_TSR_BackEnd.Models.DAO
         {
             Result result = new Result();
             var spOption = 4;
-            using(var bl = new Business())
+            using (var bl = new Business())
             {
                 try
                 {
                     bl
-                      .AddParam("@OperationType_Id",operationTypePutState.OperationType_Id)
-                      .AddParam("@Status",operationTypePutState.Status)
-                      .AddParam("@User_Logger",operationTypePutState.User_Logged)
-                      .AddParam("@SPOption",spOption)
-                      .AddParam("@StatusOut",DBNull.Value, true, 100)
-                      .AddParam("@MessageOut",DBNull.Value, true, 300)
-                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]")
+                      .AddParam("@OperationType_Id", operationTypePutState.OperationType_Id)
+                      .AddParam("@Status", operationTypePutState.Status)
+                      .AddParam("@User_Logger", operationTypePutState.User_Logged)
+                      .AddParam("@SPOption", spOption)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]");
 
                 }
                 catch (SqlException ex)
                 {
                     result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
                     result.Message = bl.GetParamValue("@MessageOut").ToString();
-                    
+
                 }
             }
             return result;
