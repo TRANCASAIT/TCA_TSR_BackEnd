@@ -4,6 +4,7 @@
     {
         public int Status_Id { get; set; }
         public string Status_Description { get; set; }
+        public string Creation_Date { get; set; }
         public string User_Logged { get; set; }
     }
 
