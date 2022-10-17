@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using static TCA_TSR_BackEnd.Models.Customer;
 using static TCA_TSR_BackEnd.Models.User;
 
 namespace TCA_TSR_BackEnd.Models.DAO
@@ -1011,7 +1012,203 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
 
         #region Customer
+        public static Result StoreCustomer(CustomerPost _obj)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@CustomerName", _obj.CustomerName)
+                      .AddParam("@Name", _obj.Name)
+                      .AddParam("@RFC", _obj.RFC)
+                      .AddParam("@Street", _obj.Street)
+                      .AddParam("@StreetExt", _obj.StreetExt)
+                      .AddParam("@StreetInt", _obj.StreetInt)
+                      .AddParam("@ZipCode", _obj.ZipCode)
+                      .AddParam("@Suburb", _obj.Suburb)
+                      .AddParam("@City_Id", _obj.City_Id)
+                      .AddParam("@State_Id", _obj.State_Id)
+                      .AddParam("@CustomerType_Id", _obj.CustomerType_Id)
+                      .AddParam("@PhoneNumber", _obj.PhoneNumber)
+                      .AddParam("@Email", _obj.Email)
+                      .AddParam("@Password", _obj.Password)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
 
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result UpdateCustomer(CustomerPut _obj)
+        {
+            Result result = new Result();
+            var spOption = 2;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@Customer_Id", _obj.Customer_Id)
+                      .AddParam("@CustomerName", _obj.CustomerName)
+                      .AddParam("@Name", _obj.Name)
+                      .AddParam("@RFC", _obj.RFC)
+                      .AddParam("@Street", _obj.Street)
+                      .AddParam("@StreetExt", _obj.StreetExt)
+                      .AddParam("@StreetInt", _obj.StreetInt)
+                      .AddParam("@ZipCode", _obj.ZipCode)
+                      .AddParam("@Suburb", _obj.Suburb)
+                      .AddParam("@City_Id", _obj.City_Id)
+                      .AddParam("@State_Id", _obj.State_Id)
+                      .AddParam("@CustomerType_Id", _obj.CustomerType_Id)
+                      .AddParam("@PhoneNumber", _obj.PhoneNumber)
+                      .AddParam("@Email", _obj.Email)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<Customer> GetCustomers()
+        {
+            var spOption = 3;
+            List<Customer> customers = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        customers = new List<Customer>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            customers.Add(new Customer()
+                            {
+                                Customer_Id = Convert.ToInt32(item["Customer_Id"]),
+                                CustomerName = item["CustomerName"].ToString(),
+                                Name = item["Name"].ToString(),
+                                RFC = item["RFC"].ToString(),
+                                Street = item["Street"].ToString(),
+                                StreetExt = item["StreetExt"].ToString(),
+                                StreetInt = item["StreetInt"].ToString(),
+                                ZipCode = item["ZipCode"].ToString(),
+                                Suburb = item["Suburb"].ToString(),
+                                PhoneNumber = item["PhoneNumber"].ToString(),
+                                CustomerType_Name = item["CustomerType_Name"].ToString(),
+                                State_Name = item["State_Name"].ToString(),
+                                City_Name = item["City_Name"].ToString(),
+                                Email = item["Email"].ToString(),
+                                Status = Convert.ToBoolean(item["Status"]),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return customers;
+        }
+
+        public static Result UpdateCustomerStatus(CustomerPutStatus customerPutStatus)
+        {
+            Result result = new Result();
+            var spOption = 4;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@Customer_Id", customerPutStatus.Customer_Id)
+                      .AddParam("@Status", customerPutStatus.Status)
+                      .AddParam("@User_Logged", customerPutStatus.User_Logged)
+                      .AddParam("@SPOption", spOption)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                    result.Message = bl.GetParamValue("@MessageOut").ToString();
+
+                }
+            }
+            return result;
+        }
+
+        public static Customer GetCustomerLogin(string customerName, string password)
+        {
+            var spOption = 5;
+            Customer _obj = new Customer();
+            using (var bl = new Business())
+            {
+                DataTable dtHeader = bl
+                                   .AddParam("@SpOption", spOption)
+                                   .AddParam("@CustomerName", customerName)
+                                   .AddParam("@Password", password)
+                                   .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
+
+                if (dtHeader.Rows.Count > 0)
+                {
+                    _obj.Customer_Id = Convert.ToInt32(dtHeader.Rows[0]["Customer_Id"]);
+                    _obj.Email = dtHeader.Rows[0]["Email"].ToString();
+                    _obj.CustomerName = dtHeader.Rows[0]["CustomerName"].ToString();
+                    _obj.CustomerType_Name = dtHeader.Rows[0]["CustomerType_Name"].ToString();
+                    _obj.Status = Convert.ToBoolean(dtHeader.Rows[0]["Status"]);
+                }
+            }
+            return _obj;
+        }
         #endregion
     }
 }
