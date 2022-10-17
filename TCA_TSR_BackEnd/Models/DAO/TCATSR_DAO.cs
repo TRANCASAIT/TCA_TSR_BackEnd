@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using static TCA_TSR_BackEnd.Models.User;
 
 namespace TCA_TSR_BackEnd.Models.DAO
 {
@@ -85,7 +86,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<State> GetStates()
         {
             var spOption = 3;
-            List<State> states = new List<State>();
+            List<State> states = null;
             using (var bl = new Business())
             {
                 try
@@ -199,7 +200,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<City> GetCities()
         {
             var spOption = 3;
-            List<City> cities = new List<City>();
+            List<City> cities = null;
             using (var bl = new Business())
             {
                 try
@@ -314,7 +315,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<CustomerType> GetCustomerTypes()
         {
             var spOption = 3;
-            List<CustomerType> customerTypes = new List<CustomerType>();
+            List<CustomerType> customerTypes = null;
             using (var bl = new Business())
             {
                 try
@@ -427,7 +428,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<UserType> GetUserTypes()
         {
             var spOption = 3;
-            List<UserType> userTypes = new List<UserType>();
+            List<UserType> userTypes = null;
             using (var bl = new Business())
             {
                 try
@@ -501,7 +502,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<Status> GetStatus()
         {
             var spOption = 3;
-            List<Status> status = new List<Status>();
+            List<Status> status = null;
             using (var bl = new Business())
             {
                 try
@@ -651,7 +652,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<Stops> GetStops()
         {
             var spOption = 3;
-            List<Stops> stops = new List<Stops>();
+            List<Stops> stops = null;
             using (var bl = new Business())
             {
                 try
@@ -764,7 +765,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static List<OperationType> GetOperationTypes()
         {
             var spOption = 3;
-            List<OperationType> operationTypes = new List<OperationType>();
+            List<OperationType> operationTypes = null;
             using (var bl = new Business())
             {
                 try
@@ -805,7 +806,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                     bl
                       .AddParam("@OperationType_Id", operationTypePutState.OperationType_Id)
                       .AddParam("@Status", operationTypePutState.Status)
-                      .AddParam("@User_Logger", operationTypePutState.User_Logged)
+                      .AddParam("@User_Logged", operationTypePutState.User_Logged)
                       .AddParam("@SPOption", spOption)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
@@ -827,6 +828,184 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         //TODO
         #region User
+        public static Result StoreUser(UserPost _obj)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@UserName", _obj.UserName)
+                      .AddParam("@Name", _obj.Name)
+                      .AddParam("@Last_Name", _obj.Last_Name)
+                      .AddParam("@Email", _obj.Email)
+                      .AddParam("@Password", _obj.Password)
+                      .AddParam("@UserType_Id", _obj.UserType_Id)
+                      .AddParam("@Customer_Id", _obj.Customer_Id)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result UpdateUser(UserPut _obj)
+        {
+            Result result = new Result();
+            var spOption = 2;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@User_Id", _obj.User_Id)
+                      .AddParam("@UserName", _obj.UserName)
+                      .AddParam("@Name", _obj.Name)
+                      .AddParam("@Last_Name", _obj.Last_Name)
+                      .AddParam("@Email", _obj.Email)
+                      .AddParam("@Password", _obj.Password)
+                      .AddParam("@UserType_Id", _obj.UserType_Id)
+                      .AddParam("@Customer_Id", _obj.Customer_Id)
+                      .AddParam("@User_Logged", _obj.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<User> GetUsers()
+        {
+            var spOption = 3;
+            List<User> users = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        users = new List<User>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            users.Add(new User()
+                            {
+                                User_Id = Convert.ToInt32(item["User_Id"]),
+                                UserName = item["UserName"].ToString(),
+                                Name = item["Name"].ToString(),
+                                Last_Name = item["Last_Name"].ToString(),
+                                Customer_Name = item["Customer_Name"].ToString(),
+                                UserType_Name = item["UserType_Name"].ToString(),
+                                Email = item["Email"].ToString(),
+                                Status = Convert.ToBoolean(item["Status"]),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return users;
+        }
+
+        public static Result UpdateUserStatus(UserPutStatus userPutStatus)
+        {
+            Result result = new Result();
+            var spOption = 4;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@User_Id", userPutStatus.User_Id)
+                      .AddParam("@Status", userPutStatus.Status)
+                      .AddParam("@User_Logged", userPutStatus.User_Logged)
+                      .AddParam("@SPOption", spOption)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                    result.Message = bl.GetParamValue("@MessageOut").ToString();
+
+                }
+            }
+            return result;
+        }
+
+        public static User GetUserLogin(string userName, string password)
+        {
+            var spOption = 5;
+            User _user = new User();
+            using (var bl = new Business())
+            {
+                DataTable dtHeader = bl
+                                   .AddParam("@SpOption", spOption)
+                                   .AddParam("@UserName", userName)
+                                   .AddParam("@Password", password)
+                                   .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+
+                if (dtHeader.Rows.Count > 0)
+                {
+                    _user.User_Id = Convert.ToInt32(dtHeader.Rows[0]["User_Id"]);
+                    _user.Email = dtHeader.Rows[0]["Email"].ToString();
+                    _user.UserName = dtHeader.Rows[0]["UserName"].ToString();
+                    _user.UserType_Name = dtHeader.Rows[0]["UserType_Name"].ToString();
+                    _user.UserType_Id = Convert.ToInt32(dtHeader.Rows[0]["UserType_Id"]); 
+                    _user.Status = Convert.ToBoolean(dtHeader.Rows[0]["Status"]);
+                }
+            }
+            return _user;
+        }
 
         #endregion
 
