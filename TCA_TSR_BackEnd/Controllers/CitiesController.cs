@@ -34,7 +34,7 @@ namespace TCA_TSR_BackEnd.Controllers
             if(cityPost.City_Name.Length > 0 && cityPost.User_Logged.Length > 0 && cityPost.State_Id > 0)
             {
                 result = TCATSR_DAO.StoreCity(cityPost);
-                return Ok(cityPost);
+                return Ok(result);
             }
             else
             {
@@ -52,7 +52,7 @@ namespace TCA_TSR_BackEnd.Controllers
             if (cityPut.City_Name.Length > 0 && cityPut.User_Logged.Length > 0 && cityPut.State_Id > 0 && cityPut.City_Id > 0)
             {
                 result = TCATSR_DAO.UpdateCity(cityPut);
-                return Ok(cityPut);
+                return Ok(result);
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TCA_TSR_BackEnd.Models;
 using TCA_TSR_BackEnd.Models.DAO;
+using static TCA_TSR_BackEnd.Models.User;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -59,6 +60,23 @@ namespace TCA_TSR_BackEnd.Controllers
                 result.State = 1;
                 result.Message = "Verifique los datos";
                 return Ok(result);
+            }
+        }
+
+        [HttpPut("OperationTypePutState")]
+        public IActionResult PutStatus(OperationTypePutState operationTypePutState)
+        {
+            Result result = new Result();
+            if (operationTypePutState.OperationType_Id > 0 && operationTypePutState.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.UpdateOperationTypeStatus(operationTypePutState);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
             }
         }
     }

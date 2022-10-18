@@ -1,4 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TCA_TSR_BackEnd.Models.DAO;
+using TCA_TSR_BackEnd.Models;
+using static TCA_TSR_BackEnd.Models.User;
+using static TCA_TSR_BackEnd.Models.Customer;
+using System.Text;
+using System.Security.Cryptography;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,34 +16,114 @@ namespace TCA_TSR_BackEnd.Controllers
     {
         // GET: api/<UsersController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<UsersController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            Result result = new Result();
+            List<User> users = TCATSR_DAO.GetUsers();
+            if (users != null)
+            {
+                return Ok(users);
+            }
+            else
+            {
+                result.NumberRecords = 0;
+                result.State = 1;
+                return Ok(result);
+            }
         }
 
         // POST api/<UsersController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] UserPost user)
         {
+            Result result = new Result();
+            if(user.UserName.Length > 0 && user.Name.Length > 0 && user.Last_Name.Length > 0 && user.UserType_Id > 0
+                && user.Customer_Id > 0 && user.Email.Length > 0 && user.Password.Length > 0 && user.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.StoreUser(user);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
         }
 
         // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut()]
+        public IActionResult Put([FromBody] UserPut user )
         {
+            Result result = new Result();
+            if (user.User_Id > 0 && user.UserName.Length > 0 && user.Name.Length > 0 && user.Last_Name.Length > 0 && user.UserType_Id > 0
+                && user.Customer_Id > 0 && user.Email.Length > 0 && user.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.UpdateUser(user);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
         }
 
-        // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+
+        [HttpPut("UserPutState")]
+        public IActionResult PutStatus(UserPutStatus userPutStatus)
         {
+            Result result = new Result();
+            if (userPutStatus.User_Id > 0 && userPutStatus.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.UpdateUserStatus(userPutStatus);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
+        }
+
+        [HttpPost("PostUserLogin")]
+        public IActionResult Login(UserLogin us)
+        {
+            var _password = GetSHA256(us.Password);
+            var user = TCATSR_DAO.GetUserLogin(us.UserName, _password);
+            Result result = new Result();
+            if (user == null || user.User_Id == 0)
+            {
+
+                result.State = 404;
+                result.Message = "Credeciales de acceso invalidas, verifique.";
+                result.Identificador = 1;
+                return NotFound(result);
+            }
+            else if (user.Status == false)
+            {
+                result.State = 404;
+                result.Message = "Usuario deshabilitado, favor de contactar al departamento de sistemas";
+                result.Identificador = 2;
+                return NotFound(result);
+            }
+            else
+            {
+                return Ok(user);
+            }
+        }
+
+        public static string GetSHA256(string str)
+        {
+            SHA256 sha256 = SHA256.Create();
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] stream = null;
+            StringBuilder sb = new StringBuilder();
+            stream = sha256.ComputeHash(encoding.GetBytes(str));
+            for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
+            return sb.ToString();
         }
     }
 }

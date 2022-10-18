@@ -1,5 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 using static TCA_TSR_BackEnd.Models.Customer;
 using static TCA_TSR_BackEnd.Models.User;
 
@@ -131,7 +133,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 {
                     bl
                       .AddParam("@SpOption", spOption)
-                      .AddParam("@Ciy_Name", _obj.City_Name)
+                      .AddParam("@City_Name", _obj.City_Name)
                       .AddParam("@State_Id", _obj.State_Id)
                       .AddParam("@User_Logged", _obj.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
@@ -517,8 +519,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                         {
                             status.Add(new Status()
                             {
-                                Status_Id = Convert.ToInt32(item["State_Id"]),
-                                Status_Description = item["State_Name"].ToString(),
+                                Status_Id = Convert.ToInt32(item["Status_Id"]),
+                                Status_Description = item["Status_Description"].ToString(),
                                 Creation_Date = item["Creation_Date"].ToString()
                             });
                         }
@@ -782,7 +784,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                             {
                                 OperationType_Id = Convert.ToInt32(item["OperationType_Id"]),
                                 OperationType_Name = item["OperationType_Name"].ToString(),
-                                Creation_Date = item["Creation_Date"].ToString()
+                                Creation_Date = item["Creation_Date"].ToString(),
+                                Status = Convert.ToBoolean(item["Status"]),
                             });
                         }
                     }
@@ -806,19 +809,28 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 {
                     bl
                       .AddParam("@OperationType_Id", operationTypePutState.OperationType_Id)
-                      .AddParam("@Status", operationTypePutState.Status)
+                      .AddParam("@Operation_Status", operationTypePutState.Status)
                       .AddParam("@User_Logged", operationTypePutState.User_Logged)
                       .AddParam("@SPOption", spOption)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[OperationTypeProcedures]");
 
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
                 }
                 catch (SqlException ex)
                 {
-                    result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                    result.Message = bl.GetParamValue("@MessageOut").ToString();
-
+                    result.State = ex.State;
+                    result.Message = ex.Message;
                 }
             }
             return result;
@@ -831,6 +843,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         #region User
         public static Result StoreUser(UserPost _obj)
         {
+            _obj.Password = GetSHA256(_obj.Password);
             Result result = new Result();
             int spOption = 1;
             using (var bl = new Business())
@@ -887,7 +900,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Name", _obj.Name)
                       .AddParam("@Last_Name", _obj.Last_Name)
                       .AddParam("@Email", _obj.Email)
-                      .AddParam("@Password", _obj.Password)
                       .AddParam("@UserType_Id", _obj.UserType_Id)
                       .AddParam("@Customer_Id", _obj.Customer_Id)
                       .AddParam("@User_Logged", _obj.User_Logged)
@@ -937,7 +949,9 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 UserName = item["UserName"].ToString(),
                                 Name = item["Name"].ToString(),
                                 Last_Name = item["Last_Name"].ToString(),
-                                Customer_Name = item["Customer_Name"].ToString(),
+                                Customer_Name = item["CustomerName"].ToString(),
+                                UserType_Id = Convert.ToInt32(item["UserType_Id"]),
+                                Customer_Id = Convert.ToInt32(item["Customer_Id"]),
                                 UserType_Name = item["UserType_Name"].ToString(),
                                 Email = item["Email"].ToString(),
                                 Status = Convert.ToBoolean(item["Status"]),
@@ -972,12 +986,21 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
 
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
                 }
                 catch (SqlException ex)
                 {
-                    result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                    result.Message = bl.GetParamValue("@MessageOut").ToString();
-
+                    result.State = ex.State;
+                    result.Message = ex.Message;
                 }
             }
             return result;
@@ -1014,6 +1037,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         #region Customer
         public static Result StoreCustomer(CustomerPost _obj)
         {
+            _obj.Password = GetSHA256(_obj.Password);
             Result result = new Result();
             int spOption = 1;
             using (var bl = new Business())
@@ -1134,8 +1158,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 Name = item["Name"].ToString(),
                                 RFC = item["RFC"].ToString(),
                                 Street = item["Street"].ToString(),
-                                StreetExt = item["StreetExt"].ToString(),
-                                StreetInt = item["StreetInt"].ToString(),
+                                StreetExt = item["Street_Ext_Number"].ToString(),
+                                StreetInt = item["Street_Int_Number"].ToString(),
                                 ZipCode = item["ZipCode"].ToString(),
                                 Suburb = item["Suburb"].ToString(),
                                 PhoneNumber = item["PhoneNumber"].ToString(),
@@ -1175,12 +1199,21 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
 
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
                 }
                 catch (SqlException ex)
                 {
-                    result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                    result.Message = bl.GetParamValue("@MessageOut").ToString();
-
+                    result.State = ex.State;
+                    result.Message = ex.Message;
                 }
             }
             return result;
@@ -1209,6 +1242,22 @@ namespace TCA_TSR_BackEnd.Models.DAO
             }
             return _obj;
         }
+        #endregion
+
+
+        #region Methods
+        public static string GetSHA256(string str)
+        {
+            SHA256 sha256 = SHA256Managed.Create();
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] stream = null;
+            StringBuilder sb = new StringBuilder();
+            stream = sha256.ComputeHash(encoding.GetBytes(str));
+            for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
+            return sb.ToString();
+        }
+
+
         #endregion
     }
 }

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
+using System.Text;
 using TCA_TSR_BackEnd.Models;
 using TCA_TSR_BackEnd.Models.DAO;
 using static TCA_TSR_BackEnd.Models.Customer;
+using static TCA_TSR_BackEnd.Models.User;
 
 namespace TCA_TSR_BackEnd.Controllers
 {
@@ -38,7 +41,7 @@ namespace TCA_TSR_BackEnd.Controllers
                 && customerPost.PhoneNumber.Length > 0 && customerPost.Password.Length > 0)
             {
                 result = TCATSR_DAO.StoreCustomer(customerPost);
-                return Ok(customerPost);
+                return Ok(result);
             }
             else
             {
@@ -59,7 +62,7 @@ namespace TCA_TSR_BackEnd.Controllers
                 && customerPut.PhoneNumber.Length > 0 && customerPut.Email.Length > 0)
             {
                 result = TCATSR_DAO.UpdateCustomer(customerPut);
-                return Ok(customerPut);
+                return Ok(result);
             }
             else
             {
@@ -69,14 +72,14 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
-        [HttpPut()]
+        [HttpPut("CustomerPutState")]
         public IActionResult PutStatus([FromBody] CustomerPutStatus customerPutStatus)
         {
             Result result = new Result();
             if (customerPutStatus.Customer_Id > 0)
             {
                 result = TCATSR_DAO.UpdateCustomerStatus(customerPutStatus);
-                return Ok(customerPutStatus);
+                return Ok(result);
             }
             else
             {
@@ -86,6 +89,44 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
+
+        [HttpPost("PostCustomerLogin")]
+        public IActionResult Login(CustomerLogin us)
+        {
+            var _password = GetSHA256(us.Password);
+            var user = TCATSR_DAO.GetCustomerLogin(us.Customer, _password);
+            Result result = new Result();
+            if (user == null || user.Customer_Id == 0)
+            {
+
+                result.State = 404;
+                result.Message = "Credeciales de acceso invalidas, verifique.";
+                result.Identificador = 1;
+                return NotFound(result);
+            }
+            else if (user.Status == false)
+            {
+                result.State = 404;
+                result.Message = "Usuario deshabilitado, favor de contactar al departamento de sistemas";
+                result.Identificador = 2;
+                return NotFound(result);
+            }
+            else
+            {
+                return Ok(user);
+            }
+        }
+
+        public static string GetSHA256(string str)
+        {
+            SHA256 sha256 = SHA256.Create();
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] stream = null;
+            StringBuilder sb = new StringBuilder();
+            stream = sha256.ComputeHash(encoding.GetBytes(str));
+            for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
+            return sb.ToString();
+        }
 
     }
 }
