@@ -121,7 +121,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #endregion
 
-
         #region City
         public static Result StoreCity(CityPost _obj)
         {
@@ -238,118 +237,116 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #endregion
 
-
         #region CustomerType
-        public static Result StoreCustomerType(CustomerTypePost _obj)
-        {
-            Result result = new Result();
-            int spOption = 1;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    bl
-                      .AddParam("@SpOption", spOption)
-                      .AddParam("@CustomerType_Name", _obj.CustomerType_Name)
-                      .AddParam("@User_Logged", _obj.User_Logged)
-                      .AddParam("@StatusOut", DBNull.Value, true, 100)
-                      .AddParam("@MessageOut", DBNull.Value, true, 300)
-                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerTypeProcedures]");
+        //public static Result StoreCustomerType(CustomerTypePost _obj)
+        //{
+        //    Result result = new Result();
+        //    int spOption = 1;
+        //    using (var bl = new Business())
+        //    {
+        //        try
+        //        {
+        //            bl
+        //              .AddParam("@SpOption", spOption)
+        //              .AddParam("@CustomerType_Name", _obj.CustomerType_Name)
+        //              .AddParam("@User_Logged", _obj.User_Logged)
+        //              .AddParam("@StatusOut", DBNull.Value, true, 100)
+        //              .AddParam("@MessageOut", DBNull.Value, true, 300)
+        //              .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerTypeProcedures]");
 
-                    if (bl.Exception != null)
-                    {
-                        result.State = 1;
-                        result.Message = bl.Exception;
-                    }
-                    else
-                    {
-                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                        result.Message = bl.GetParamValue("@MessageOut").ToString();
-                    }
+        //            if (bl.Exception != null)
+        //            {
+        //                result.State = 1;
+        //                result.Message = bl.Exception;
+        //            }
+        //            else
+        //            {
+        //                result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+        //                result.Message = bl.GetParamValue("@MessageOut").ToString();
+        //            }
 
-                }
-                catch (SqlException ex)
-                {
-                    result.State = ex.State;
-                    result.Message = ex.Message;
-                }
-            }
-            return result;
-        }
+        //        }
+        //        catch (SqlException ex)
+        //        {
+        //            result.State = ex.State;
+        //            result.Message = ex.Message;
+        //        }
+        //    }
+        //    return result;
+        //}
 
-        public static Result UpdateCustomerType(CustomerTypePut _obj)
-        {
-            Result result = new Result();
-            var spOption = 2;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    bl
-                        .AddParam("@CustomerType_Id", _obj.CustomerType_Id)
-                        .AddParam("@CustomerType_Name", _obj.CustomerType_Name)
-                        .AddParam("@User_Logged", _obj.User_Logged)
-                        .AddParam("@StatusOut", DBNull.Value, true, 100)
-                        .AddParam("@MessageOut", DBNull.Value, true, 300)
-                        .AddParam("@SPOption", spOption)
-                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerTypeProcedures]");
+        //public static Result UpdateCustomerType(CustomerTypePut _obj)
+        //{
+        //    Result result = new Result();
+        //    var spOption = 2;
+        //    using (var bl = new Business())
+        //    {
+        //        try
+        //        {
+        //            bl
+        //                .AddParam("@CustomerType_Id", _obj.CustomerType_Id)
+        //                .AddParam("@CustomerType_Name", _obj.CustomerType_Name)
+        //                .AddParam("@User_Logged", _obj.User_Logged)
+        //                .AddParam("@StatusOut", DBNull.Value, true, 100)
+        //                .AddParam("@MessageOut", DBNull.Value, true, 300)
+        //                .AddParam("@SPOption", spOption)
+        //                .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CustomerTypeProcedures]");
 
-                    if (bl.Exception != null)
-                    {
-                        result.State = 1;
-                        result.Message = bl.Exception;
-                    }
-                    else
-                    {
-                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                        result.Message = bl.GetParamValue("@MessageOut").ToString();
-                    }
+        //            if (bl.Exception != null)
+        //            {
+        //                result.State = 1;
+        //                result.Message = bl.Exception;
+        //            }
+        //            else
+        //            {
+        //                result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+        //                result.Message = bl.GetParamValue("@MessageOut").ToString();
+        //            }
 
-                }
-                catch (SqlException ex)
-                {
-                    result.State = ex.State;
-                    result.Message = ex.Message;
-                }
-            }
-            return result;
-        }
+        //        }
+        //        catch (SqlException ex)
+        //        {
+        //            result.State = ex.State;
+        //            result.Message = ex.Message;
+        //        }
+        //    }
+        //    return result;
+        //}
 
-        public static List<CustomerType> GetCustomerTypes()
-        {
-            var spOption = 3;
-            List<CustomerType> customerTypes = null;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    DataTable dt = bl.AddParam("@SPOption", spOption)
-                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerTypeProcedures]");
-                    if (dt.Rows.Count > 0)
-                    {
-                        customerTypes = new List<CustomerType>();
-                        foreach (DataRow item in dt.Rows)
-                        {
-                            customerTypes.Add(new CustomerType()
-                            {
-                                CustomerType_Id = Convert.ToInt32(item["CustomerType_Id"]),
-                                CustomerType_Name = item["CustomerType_Name"].ToString(),
-                                Creation_Date = item["Creation_Date"].ToString()
-                            });
-                        }
-                    }
-                }
-                catch (Exception)
-                {
+        //public static List<CustomerType> GetCustomerTypes()
+        //{
+        //    var spOption = 3;
+        //    List<CustomerType> customerTypes = null;
+        //    using (var bl = new Business())
+        //    {
+        //        try
+        //        {
+        //            DataTable dt = bl.AddParam("@SPOption", spOption)
+        //                .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerTypeProcedures]");
+        //            if (dt.Rows.Count > 0)
+        //            {
+        //                customerTypes = new List<CustomerType>();
+        //                foreach (DataRow item in dt.Rows)
+        //                {
+        //                    customerTypes.Add(new CustomerType()
+        //                    {
+        //                        CustomerType_Id = Convert.ToInt32(item["CustomerType_Id"]),
+        //                        CustomerType_Name = item["CustomerType_Name"].ToString(),
+        //                        Creation_Date = item["Creation_Date"].ToString()
+        //                    });
+        //                }
+        //            }
+        //        }
+        //        catch (Exception)
+        //        {
 
-                    throw;
-                }
-            }
-            return customerTypes;
-        }
+        //            throw;
+        //        }
+        //    }
+        //    return customerTypes;
+        //}
 
         #endregion
-
 
         #region UserType
 
@@ -463,7 +460,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #endregion
 
-
         #region Status
         public static Result StoreStatus(StatusPost _status)
         {
@@ -573,7 +569,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
         #endregion
-
 
         #region STOPs
 
@@ -686,7 +681,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
         }
 
         #endregion
-
 
         #region OperationType
 
@@ -838,8 +832,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #endregion
 
-
-        //TODO
         #region User
         public static Result StoreUser(UserPost _obj)
         {
@@ -1033,11 +1025,9 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         #endregion
 
-
         #region Customer
         public static Result StoreCustomer(CustomerPost _obj)
         {
-            _obj.Password = GetSHA256(_obj.Password);
             Result result = new Result();
             int spOption = 1;
             using (var bl = new Business())
@@ -1046,7 +1036,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 {
                     bl
                       .AddParam("@SpOption", spOption)
-                      .AddParam("@CustomerName", _obj.CustomerName)
                       .AddParam("@Name", _obj.Name)
                       .AddParam("@RFC", _obj.RFC)
                       .AddParam("@Street", _obj.Street)
@@ -1056,10 +1045,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Suburb", _obj.Suburb)
                       .AddParam("@City_Id", _obj.City_Id)
                       .AddParam("@State_Id", _obj.State_Id)
-                      .AddParam("@CustomerType_Id", _obj.CustomerType_Id)
                       .AddParam("@PhoneNumber", _obj.PhoneNumber)
                       .AddParam("@Email", _obj.Email)
-                      .AddParam("@Password", _obj.Password)
                       .AddParam("@User_Logged", _obj.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
@@ -1097,7 +1084,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                     bl
                       .AddParam("@SpOption", spOption)
                       .AddParam("@Customer_Id", _obj.Customer_Id)
-                      .AddParam("@CustomerName", _obj.CustomerName)
                       .AddParam("@Name", _obj.Name)
                       .AddParam("@RFC", _obj.RFC)
                       .AddParam("@Street", _obj.Street)
@@ -1107,7 +1093,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Suburb", _obj.Suburb)
                       .AddParam("@City_Id", _obj.City_Id)
                       .AddParam("@State_Id", _obj.State_Id)
-                      .AddParam("@CustomerType_Id", _obj.CustomerType_Id)
                       .AddParam("@PhoneNumber", _obj.PhoneNumber)
                       .AddParam("@Email", _obj.Email)
                       .AddParam("@User_Logged", _obj.User_Logged)
@@ -1154,7 +1139,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                             customers.Add(new Customer()
                             {
                                 Customer_Id = Convert.ToInt32(item["Customer_Id"]),
-                                CustomerName = item["CustomerName"].ToString(),
                                 Name = item["Name"].ToString(),
                                 RFC = item["RFC"].ToString(),
                                 Street = item["Street"].ToString(),
@@ -1163,7 +1147,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 ZipCode = item["ZipCode"].ToString(),
                                 Suburb = item["Suburb"].ToString(),
                                 PhoneNumber = item["PhoneNumber"].ToString(),
-                                CustomerType_Name = item["CustomerType_Name"].ToString(),
                                 State_Name = item["State_Name"].ToString(),
                                 City_Name = item["City_Name"].ToString(),
                                 Email = item["Email"].ToString(),
@@ -1175,7 +1158,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
             }
@@ -1219,29 +1201,29 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-        public static Customer GetCustomerLogin(string customerName, string password)
-        {
-            var spOption = 5;
-            Customer _obj = new Customer();
-            using (var bl = new Business())
-            {
-                DataTable dtHeader = bl
-                                   .AddParam("@SpOption", spOption)
-                                   .AddParam("@CustomerName", customerName)
-                                   .AddParam("@Password", password)
-                                   .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
+        //public static Customer GetCustomerLogin(string customerName, string password)
+        //{
+        //    var spOption = 5;
+        //    Customer _obj = new Customer();
+        //    using (var bl = new Business())
+        //    {
+        //        DataTable dtHeader = bl
+        //                           .AddParam("@SpOption", spOption)
+        //                           .AddParam("@CustomerName", customerName)
+        //                           .AddParam("@Password", password)
+        //                           .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
 
-                if (dtHeader.Rows.Count > 0)
-                {
-                    _obj.Customer_Id = Convert.ToInt32(dtHeader.Rows[0]["Customer_Id"]);
-                    _obj.Email = dtHeader.Rows[0]["Email"].ToString();
-                    _obj.CustomerName = dtHeader.Rows[0]["CustomerName"].ToString();
-                    _obj.CustomerType_Name = dtHeader.Rows[0]["CustomerType_Name"].ToString();
-                    _obj.Status = Convert.ToBoolean(dtHeader.Rows[0]["Status"]);
-                }
-            }
-            return _obj;
-        }
+        //        if (dtHeader.Rows.Count > 0)
+        //        {
+        //            _obj.Customer_Id = Convert.ToInt32(dtHeader.Rows[0]["Customer_Id"]);
+        //            _obj.Email = dtHeader.Rows[0]["Email"].ToString();
+        //            _obj.CustomerName = dtHeader.Rows[0]["CustomerName"].ToString();
+        //            _obj.CustomerType_Name = dtHeader.Rows[0]["CustomerType_Name"].ToString();
+        //            _obj.Status = Convert.ToBoolean(dtHeader.Rows[0]["Status"]);
+        //        }
+        //    }
+        //    return _obj;
+        //}
         #endregion
 
 

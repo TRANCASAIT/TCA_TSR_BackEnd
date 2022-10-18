@@ -35,10 +35,10 @@ namespace TCA_TSR_BackEnd.Controllers
         public IActionResult Post([FromBody] CustomerPost customerPost)
         {
             Result result = new Result();
-            if (customerPost.CustomerName.Length > 0 && customerPost.Name.Length > 0 && customerPost.RFC.Length > 0
+            if (customerPost.Name.Length > 0 && customerPost.RFC.Length > 0
                 && customerPost.Street.Length > 0 && customerPost.StreetExt.Length > 0 && customerPost.ZipCode.Length > 0 && customerPost.Suburb.Length > 0
                 && customerPost.City_Id > 0 && customerPost.State_Id > 0 && customerPost.CustomerType_Id > 0
-                && customerPost.PhoneNumber.Length > 0 && customerPost.Password.Length > 0)
+                && customerPost.PhoneNumber.Length > 0)
             {
                 result = TCATSR_DAO.StoreCustomer(customerPost);
                 return Ok(result);
@@ -56,7 +56,7 @@ namespace TCA_TSR_BackEnd.Controllers
         public IActionResult Put([FromBody] CustomerPut customerPut)
         {
             Result result = new Result();
-            if (customerPut.Customer_Id > 0 && customerPut.CustomerName.Length > 0 && customerPut.Name.Length > 0 && customerPut.RFC.Length > 0
+            if (customerPut.Customer_Id > 0 && customerPut.Name.Length > 0 && customerPut.RFC.Length > 0
                 && customerPut.Street.Length > 0 && customerPut.StreetExt.Length > 0 && customerPut.ZipCode.Length > 0 && customerPut.Suburb.Length > 0
                 && customerPut.City_Id > 0 && customerPut.State_Id > 0 && customerPut.CustomerType_Id > 0
                 && customerPut.PhoneNumber.Length > 0 && customerPut.Email.Length > 0)
@@ -90,32 +90,32 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
 
-        [HttpPost("PostCustomerLogin")]
-        public IActionResult Login(CustomerLogin us)
-        {
-            var _password = GetSHA256(us.Password);
-            var user = TCATSR_DAO.GetCustomerLogin(us.Customer, _password);
-            Result result = new Result();
-            if (user == null || user.Customer_Id == 0)
-            {
+        //[HttpPost("PostCustomerLogin")]
+        //public IActionResult Login(CustomerLogin us)
+        //{
+        //    var _password = GetSHA256(us.Password);
+        //    var user = TCATSR_DAO.GetCustomerLogin(us.Customer, _password);
+        //    Result result = new Result();
+        //    if (user == null || user.Customer_Id == 0)
+        //    {
 
-                result.State = 404;
-                result.Message = "Credeciales de acceso invalidas, verifique.";
-                result.Identificador = 1;
-                return NotFound(result);
-            }
-            else if (user.Status == false)
-            {
-                result.State = 404;
-                result.Message = "Usuario deshabilitado, favor de contactar al departamento de sistemas";
-                result.Identificador = 2;
-                return NotFound(result);
-            }
-            else
-            {
-                return Ok(user);
-            }
-        }
+        //        result.State = 404;
+        //        result.Message = "Credeciales de acceso invalidas, verifique.";
+        //        result.Identificador = 1;
+        //        return NotFound(result);
+        //    }
+        //    else if (user.Status == false)
+        //    {
+        //        result.State = 404;
+        //        result.Message = "Usuario deshabilitado, favor de contactar al departamento de sistemas";
+        //        result.Identificador = 2;
+        //        return NotFound(result);
+        //    }
+        //    else
+        //    {
+        //        return Ok(user);
+        //    }
+        //}
 
         public static string GetSHA256(string str)
         {

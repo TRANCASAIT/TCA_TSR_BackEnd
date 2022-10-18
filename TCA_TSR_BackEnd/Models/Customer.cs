@@ -6,7 +6,6 @@ namespace TCA_TSR_BackEnd.Models
     public class Customer
     {
         public int Customer_Id       {get; set;}
-        public string CustomerName      {get; set;}
         public string Name              {get; set;}
         public string RFC               {get; set;}
         public string Street            {get; set;}
@@ -19,13 +18,11 @@ namespace TCA_TSR_BackEnd.Models
         public string CustomerType_Name   {get; set;}
         public string PhoneNumber       {get; set;}
         public string Email             {get; set;}
-        public string Password          {get; set;}
         public string Creation_Date          {get; set;}
         public bool Status { get; set; }
 
         public class CustomerPost
         {
-            public string CustomerName { get; set; }
             public string Name { get; set; }
             public string RFC { get; set; }
             public string Street { get; set; }
@@ -38,14 +35,12 @@ namespace TCA_TSR_BackEnd.Models
             public int CustomerType_Id { get; set; }
             public string PhoneNumber { get; set; }
             public string Email { get; set; }
-            public string Password { get; set; }
             public string User_Logged { get; set; }
         }
 
         public class CustomerPut
         {
             public int Customer_Id { get; set; }
-            public string CustomerName { get; set; }
             public string Name { get; set; }
             public string RFC { get; set; }
             public string Street { get; set; }
@@ -67,11 +62,6 @@ namespace TCA_TSR_BackEnd.Models
             public int Customer_Id { get; set; }
             public bool Status { get; set; }
             public string User_Logged { get; set; }
-        }
-        public class CustomerLogin
-        {
-            public string Customer { get; set; }
-            public string Password { get; set; }
         }
     }
 }
