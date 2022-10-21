@@ -9,7 +9,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class StopsController : ControllerBase
     {
         // GET: api/<StopsController>
-        [HttpGet]
+        [HttpGet("GetStops")]
         public IActionResult Get()
         {
             Result result = new Result();

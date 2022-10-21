@@ -534,7 +534,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static Result UpdateStatus(StatusPut statusPut)
         {
             Result result = new Result();
-            var spOption = 3;
+            var spOption = 2;
             using (var bl = new Business())
             {
                 try

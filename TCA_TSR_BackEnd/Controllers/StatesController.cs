@@ -9,7 +9,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class StatesController : ControllerBase
     {
         // GET: api/<StatesController>
-        [HttpGet]
+        [HttpGet("GetStates")]
         public IActionResult GetStates()
         {
             List<State> states = TCATSR_DAO.GetStates();
@@ -26,7 +26,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // POST api/<StatesController>
-        [HttpPost]
+        [HttpPost("CreateState")]
         public IActionResult Post([FromBody] StatePost _state)
         {
             Result result = new Result();
@@ -44,7 +44,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<StatesController>/5
-        [HttpPut]
+        [HttpPut("UpdateState")]
         public IActionResult UpdateState([FromBody] StatePut statePut)
         {
             Result result = new Result();

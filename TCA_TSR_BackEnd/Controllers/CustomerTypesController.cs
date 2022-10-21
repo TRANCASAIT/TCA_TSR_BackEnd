@@ -8,6 +8,7 @@ namespace TCA_TSR_BackEnd.Controllers
     [ApiController]
     public class CustomerTypesController : ControllerBase
     {
+
         // GET: api/<CustomerTypesController>
         //[HttpGet]
         //public IActionResult Get()
