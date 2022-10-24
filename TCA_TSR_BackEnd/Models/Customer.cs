@@ -32,7 +32,6 @@ namespace TCA_TSR_BackEnd.Models
             public string Suburb { get; set; }
             public int City_Id { get; set; }
             public int State_Id { get; set; }
-            public int CustomerType_Id { get; set; }
             public string PhoneNumber { get; set; }
             public string Email { get; set; }
             public string User_Logged { get; set; }
@@ -50,7 +49,6 @@ namespace TCA_TSR_BackEnd.Models
             public string Suburb { get; set; }
             public int City_Id { get; set; }
             public int State_Id { get; set; }
-            public int CustomerType_Id { get; set; }
             public string PhoneNumber { get; set; }
             public string Email { get; set; }
             public string User_Logged { get; set; }

@@ -941,7 +941,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 UserName = item["UserName"].ToString(),
                                 Name = item["Name"].ToString(),
                                 Last_Name = item["Last_Name"].ToString(),
-                                Customer_Name = item["CustomerName"].ToString(),
                                 UserType_Id = Convert.ToInt32(item["UserType_Id"]),
                                 Customer_Id = Convert.ToInt32(item["Customer_Id"]),
                                 UserType_Name = item["UserType_Name"].ToString(),
