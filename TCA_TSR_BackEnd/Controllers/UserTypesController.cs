@@ -9,7 +9,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class UserTypesController : ControllerBase
     {
         // GET: api/<UserTypesController>
-        [HttpGet]
+        [HttpGet("GetUserTypes")]
         public IActionResult Get()
         {
             Result result = new Result();
@@ -27,7 +27,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // POST api/<UserTypesController>
-        [HttpPost]
+        [HttpPost("CreateUserType")]
         public IActionResult Post([FromBody] UserTypePost userTypePost)
         {
             Result result = new Result();
@@ -46,7 +46,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<UserTypesController>/5
-        [HttpPut]
+        [HttpPut("UpdateUserType")]
         public IActionResult Put([FromBody] UserTypePut userTypePut)
         {
             Result result = new Result();

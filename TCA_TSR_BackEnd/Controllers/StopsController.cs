@@ -27,7 +27,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // POST api/<StopsController>
-        [HttpPost]
+        [HttpPost("CreateStop")]
         public IActionResult Post([FromBody] StopsPost stopsPost)
         {
             Result result = new Result();
@@ -46,7 +46,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<StopsController>/5
-        [HttpPut]
+        [HttpPut("UpdateStop")]
         public IActionResult Put([FromBody] StopsPut stopsPut)
         {
 

@@ -10,7 +10,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class OperationTypesController : ControllerBase
     {
         // GET: api/<OperationTypesController>
-        [HttpGet]
+        [HttpGet("GetOperationTypes")]
         public IActionResult Get()
         {
             List<OperationType> operationTypes = TCATSR_DAO.GetOperationTypes();
@@ -28,7 +28,7 @@ namespace TCA_TSR_BackEnd.Controllers
 
 
         // POST api/<OperationTypesController>
-        [HttpPost]
+        [HttpPost("CreateOperationType")]
         public IActionResult Post([FromBody] OperationTypePost operationTypePost)
         {
             Result result = new Result();
@@ -46,7 +46,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<OperationTypesController>/5
-        [HttpPut]
+        [HttpPut("UpdateOperationType")]
         public IActionResult Put([FromBody] OperationTypePut operationTypePut)
         {
             Result result = new Result();

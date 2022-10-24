@@ -9,7 +9,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class CitiesController : ControllerBase
     {
         // GET: api/<CitiesController>
-        [HttpGet]
+        [HttpGet("GetCities")]
         public IActionResult Get()
         {
             Result result = new Result();
@@ -27,7 +27,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // POST api/<CitiesController>
-        [HttpPost]
+        [HttpPost("CreateCity")]
         public IActionResult Post([FromBody] CityPost cityPost)
         {
             Result result = new Result();
@@ -45,7 +45,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<CitiesController>/5
-        [HttpPut]
+        [HttpPut("UpdateCity")]
         public IActionResult Put([FromBody] CityPut cityPut)
         {
             Result result = new Result();
