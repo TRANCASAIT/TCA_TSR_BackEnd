@@ -13,7 +13,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class CustomersController : ControllerBase
     {
         // GET: api/<CustomersController>
-        [HttpGet]
+        [HttpGet("GetCustomers")]
         public IActionResult Get()
         {
             Result result = new Result();
@@ -31,7 +31,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // POST api/<CustomersController>
-        [HttpPost]
+        [HttpPost("CreateCustomer")]
         public IActionResult Post([FromBody] CustomerPost customerPost)
         {
             Result result = new Result();
@@ -52,7 +52,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<CustomersController>/5
-        [HttpPut()]
+        [HttpPut("UpdateCustomer")]
         public IActionResult Put([FromBody] CustomerPut customerPut)
         {
             Result result = new Result();

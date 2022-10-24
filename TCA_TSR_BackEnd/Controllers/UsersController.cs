@@ -15,7 +15,7 @@ namespace TCA_TSR_BackEnd.Controllers
     public class UsersController : ControllerBase
     {
         // GET: api/<UsersController>
-        [HttpGet]
+        [HttpGet("GetUsers")]
         public IActionResult Get()
         {
             Result result = new Result();
@@ -33,7 +33,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // POST api/<UsersController>
-        [HttpPost]
+        [HttpPost("CreateUser")]
         public IActionResult Post([FromBody] UserPost user)
         {
             Result result = new Result();
@@ -52,7 +52,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         // PUT api/<UsersController>/5
-        [HttpPut()]
+        [HttpPut("UpdateUser")]
         public IActionResult Put([FromBody] UserPut user )
         {
             Result result = new Result();
