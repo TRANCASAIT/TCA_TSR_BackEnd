@@ -84,7 +84,7 @@ namespace TCA_TSR_BackEnd.Controllers
             {
                 result.State = 1;
                 result.Message = "Verifique los datos";
-                return Ok();
+                return Ok(result);
             }
         }
 
@@ -94,24 +94,32 @@ namespace TCA_TSR_BackEnd.Controllers
             var _password = GetSHA256(us.Password);
             var user = TCATSR_DAO.GetUserLogin(us.UserName, _password);
             Result result = new Result();
-            if (user == null || user.User_Id == 0)
+            if (user.StatusOut == 1)
             {
-
-                result.State = 404;
-                result.Message = "Credeciales de acceso invalidas, verifique.";
-                result.Identificador = 1;
-                return NotFound(result);
-            }
-            else if (user.Status == false)
-            {
-                result.State = 404;
-                result.Message = "Usuario deshabilitado, favor de contactar al departamento de sistemas";
-                result.Identificador = 2;
-                return NotFound(result);
+                result.Message = user.MessageOut;
+                result.State = 1;
+                return BadRequest(result);
             }
             else
             {
                 return Ok(user);
+            }
+        }
+
+        [HttpPost("LogOut/{User_Id}")]
+        public IActionResult LogOut(int User_Id)
+        {
+            Result result = new Result();
+            if(User_Id > 0)
+            {
+                result = TCATSR_DAO.logOut(User_Id);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
             }
         }
 

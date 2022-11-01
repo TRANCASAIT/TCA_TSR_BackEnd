@@ -30,6 +30,23 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
+        [HttpGet("GetCustomersActive")]
+        public IActionResult GetCustomersActive()
+        {
+            Result result = new Result();
+            List<Customer> customers = TCATSR_DAO.GetCustomersActive();
+            if (customers != null)
+            {
+                return Ok(customers);
+            }
+            else
+            {
+                result.NumberRecords = 0;
+                result.State = 1;
+                return Ok(result);
+            }
+        }
+
         // POST api/<CustomersController>
         [HttpPost("CreateCustomer")]
         public IActionResult Post([FromBody] CustomerPost customerPost)

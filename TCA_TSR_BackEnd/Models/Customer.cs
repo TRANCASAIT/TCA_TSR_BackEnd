@@ -18,6 +18,8 @@ namespace TCA_TSR_BackEnd.Models
         public string CustomerType_Name   {get; set;}
         public string PhoneNumber       {get; set;}
         public string Email             {get; set;}
+        public int City_Id { get; set; }
+        public int State_Id { get; set; }
         public string Creation_Date          {get; set;}
         public bool Status { get; set; }
 

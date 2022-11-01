@@ -13,6 +13,9 @@
         public string Email { get; set; }
         public string Creation_Date { get; set; }
         public bool Status { get; set; }
+        public bool IsCustomer { get; set; }
+        public int StatusOut { get; set; }
+        public string MessageOut { get; set; }
 
         public class UserPost
         {
@@ -51,5 +54,6 @@
             public string UserName { get; set; }
             public string Password { get; set; }
         }
+
     }
 }

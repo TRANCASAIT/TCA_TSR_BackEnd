@@ -26,6 +26,23 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
+        [HttpGet("GetCitiesFiltered/{stateId}")]
+        public IActionResult GetFiltered(int stateId)
+        {
+            Result result = new Result();
+            List<City> cities = TCATSR_DAO.GetCitiesFiltered(stateId);
+            if (cities != null)
+            {
+                return Ok(cities);
+            }
+            else
+            {
+                result.NumberRecords = 0;
+                result.State = 1;
+                return Ok(result);
+            }
+        }
+
         // POST api/<CitiesController>
         [HttpPost("CreateCity")]
         public IActionResult Post([FromBody] CityPost cityPost)
