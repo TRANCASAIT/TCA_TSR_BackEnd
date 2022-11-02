@@ -887,7 +887,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Email", _obj.Email)
                       .AddParam("@Password", _obj.Password)
                       .AddParam("@UserType_Id", _obj.UserType_Id)
-                      .AddParam("@Customer_Id", _obj.Customer_Id)
+                      .AddParam("@Customer_Id", _obj.Customer_Id) 
                       .AddParam("@User_Logged", _obj.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
