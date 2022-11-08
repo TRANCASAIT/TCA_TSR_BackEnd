@@ -1666,6 +1666,44 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
+        public static Result RemoveFile(RemoveFile sr)
+        {
+            Result result = new Result();
+            int spOption = 8;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", sr.ServiceRequest_Id)
+                      .AddParam("@Document_Id", sr.Document_Id)
+                      .AddParam("@DocumentType", sr.Document_Type)
+                      .AddParam("@User_Logged", sr.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
 
         public static Result setConsigmentNote(setConsigmentNote sr)
         {
