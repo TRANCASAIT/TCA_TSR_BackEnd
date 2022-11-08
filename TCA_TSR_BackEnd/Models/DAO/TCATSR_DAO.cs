@@ -879,8 +879,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         public static Result UpdateUser(UserPut _obj)
         {
-            _obj.Password = GetSHA256(_obj.Password);
-            Result result = new Result();
             var spOption = 2;
             using (var bl = new Business())
             {
@@ -893,7 +891,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Name", _obj.Name)
                       .AddParam("@Last_Name", _obj.Last_Name)
                       .AddParam("@Email", _obj.Email)
-                      .AddParam("@Password", _obj.Password)
                       .AddParam("@UserType_Id", _obj.UserType_Id)
                       .AddParam("@Customer_Id", _obj.Customer_Id)
                       .AddParam("@User_Logged", _obj.User_Logged)
