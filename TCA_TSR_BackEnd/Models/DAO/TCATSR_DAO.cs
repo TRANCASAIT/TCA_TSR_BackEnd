@@ -1693,7 +1693,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@SpOption", spOption)
                       .AddParam("@ServiceRequest_Id", sr.ServiceRequest_Id)
                       .AddParam("@Document_Id", sr.Document_Id)
-                      .AddParam("@Consigment_Note", sr.Consigment_Note)
+                      .AddParam("@Consignment_Note", sr.Consigment_Note)
                       .AddParam("@User_Logged", sr.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
