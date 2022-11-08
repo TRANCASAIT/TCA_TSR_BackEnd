@@ -91,6 +91,17 @@
             public string Url { get; set; }
         }
 
+        public class RemoveFile
+        {
+            public int ServiceRequest_Id { get; set; }
+            public int Document_Id { get; set; }
+            public int Stop_Number { get; set; }
+            public int Document_Type { get; set; }
+            public string Url { get; set; }
+            public string FileName { get; set; }
+            public string User_Logged { get; set; }
+        }
+
         public class setTMW
         {
             public int ServiceRequest_Id { get; set; }

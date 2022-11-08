@@ -37,7 +37,6 @@ namespace TCA_TSR_BackEnd.Controllers
                 {
                     if (uf.Document_Type == 1 || uf.Document_Type == 2 || uf.Document_Type == 3 || uf.Document_Type == 4 || uf.Document_Type == 5 || uf.Document_Type == 6 || uf.Document_Type == 8 || uf.Document_Type == 9)
                     {
-                        
                         var filePath = Path.Combine(@"App_Data/Solicitudes/" + "SR-"+ Convert.ToString(uf.ServiceRequest_Id) + "/Documents/" + "DC-" +Convert.ToString(uf.Document_Id) + "/File-" + Convert.ToString(uf.Document_Type) + "/" + uf.DocumentFile.FileName);
                         new FileInfo(filePath).Directory?.Create();
                         await using (var stream = new FileStream(filePath, FileMode.Create))
@@ -106,6 +105,26 @@ namespace TCA_TSR_BackEnd.Controllers
             var filname = Path.GetFileName(filePath);
             var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
             return File(bytes, contentType, Path.GetFileName(filePath));
+        }
+
+
+        [HttpPost("RemoveFile")]
+        public IActionResult RemoveFile(RemoveFile rf)
+        {
+            Result result = new Result();
+            var filePath = Path.Combine(@"App_Data/Solicitudes/ " + "SR- " + Convert.ToString(rf.ServiceRequest_Id) + "/Documents/ " + "DC-" + Convert.ToString(rf.Document_Id) + "/File-" + Convert.ToString(rf.Document_Type) + "/" + rf.FileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                result.Message = "El archivo no existe";
+                result.State = 1;
+                return Ok(result);
+            }
+            else
+            {
+                System.IO.File.Delete(filePath);
+                return Ok();
+            }
         }
     
 
