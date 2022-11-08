@@ -235,6 +235,41 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return cities;
         }
 
+        public static List<City> GetCitiesFiltered(int stateId)
+        {
+            var spOption = 4;
+            List<City> cities = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .AddParam("@State_Id", stateId)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CityProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        cities = new List<City>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            cities.Add(new City()
+                            {
+                                City_Id = Convert.ToInt32(item["City_Id"]),
+                                State_Id = Convert.ToInt32(item["State_Id"]),
+                                City_Name = item["City_Name"].ToString(),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return cities;
+        }
+
 
         #endregion
 
@@ -1023,6 +1058,41 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return _user;
         }
 
+        public static Result logOut(int User_Id)
+        {
+            Result result = new Result();
+            var spOption = 6;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@User_Id", User_Id)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
         #endregion
 
         #region Customer
@@ -1201,6 +1271,51 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
+        public static List<Customer> GetCustomersActive()
+        {
+            var spOption = 5;
+            List<Customer> customers = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        customers = new List<Customer>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            customers.Add(new Customer()
+                            {
+                                Customer_Id = Convert.ToInt32(item["Customer_Id"]),
+                                State_Id = Convert.ToInt32(item["State_Id"]),
+                                City_Id = Convert.ToInt32(item["City_Id"]),
+                                Name = item["Name"].ToString(),
+                                RFC = item["RFC"].ToString(),
+                                Street = item["Street"].ToString(),
+                                StreetExt = item["Street_Ext_Number"].ToString(),
+                                StreetInt = item["Street_Int_Number"].ToString(),
+                                ZipCode = item["ZipCode"].ToString(),
+                                Suburb = item["Suburb"].ToString(),
+                                PhoneNumber = item["PhoneNumber"].ToString(),
+                                State_Name = item["State_Name"].ToString(),
+                                City_Name = item["City_Name"].ToString(),
+                                Email = item["Email"].ToString(),
+                                Status = Convert.ToBoolean(item["Status"]),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return customers;
+        }
+
         //public static Customer GetCustomerLogin(string customerName, string password)
         //{
         //    var spOption = 5;
@@ -1225,6 +1340,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         //    return _obj;
         //}
         #endregion
+
 
         #region service request
         public static Result StoreServiceRequest(ServiceRequestPost sr)
@@ -1382,7 +1498,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 try
                 {
                     DataTable dt = bl.AddParam("@SPOption", spOption)
-                        .AddParam("@ServiceRequest_Id",srId)
+                        .AddParam("@ServiceRequest_Id", srId)
                         .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
                     if (dt.Rows.Count > 0)
                     {
@@ -1507,7 +1623,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-        
+
 
         public static Result UploadFile(UploadFile sr, string path, string fileName)
         {
@@ -1563,47 +1679,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@SpOption", spOption)
                       .AddParam("@ServiceRequest_Id", sr.ServiceRequest_Id)
                       .AddParam("@Document_Id", sr.Document_Id)
-                      .AddParam("@Consignment_Note", sr.Consigment_Note)
+                      .AddParam("@Consigment_Note", sr.Consigment_Note)
                       .AddParam("@User_Logged", sr.User_Logged)
-                      .AddParam("@StatusOut", DBNull.Value, true, 100)
-                      .AddParam("@MessageOut", DBNull.Value, true, 300)
-                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
-
-                    if (bl.Exception != null)
-                    {
-                        result.State = 1;
-                        result.Message = bl.Exception;
-                    }
-                    else
-                    {
-                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                        result.Message = bl.GetParamValue("@MessageOut").ToString();
-                    }
-
-                }
-                catch (SqlException ex)
-                {
-                    result.State = ex.State;
-                    result.Message = ex.Message;
-                }
-            }
-            return result;
-        }
-
-        public static Result RemoveFile(RemoveFile rf)
-        {
-            Result result = new Result();
-            int spOption = 8;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    bl
-                      .AddParam("@SpOption", spOption)
-                      .AddParam("@ServiceRequest_Id", rf.ServiceRequest_Id)
-                      .AddParam("@Document_Id", rf.Document_Id)
-                      .AddParam("@DocumentType", rf.Document_Type)
-                      .AddParam("@User_Logged", rf.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
@@ -1640,9 +1717,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
             stream = sha256.ComputeHash(encoding.GetBytes(str));
             for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
             return sb.ToString();
-        }
-
-        
+        }       
 
         #endregion
     }
