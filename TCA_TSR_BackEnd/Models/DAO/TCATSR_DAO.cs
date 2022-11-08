@@ -1583,6 +1583,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 OperationsPDF = item["OperationsPDF"].ToString(),
                                 OpPdfFN = item["OpPdfFN"].ToString(),
                                 OpPdfdtm = item["OpPdfdtm"].ToString(),
+                                Consigment_Note = item["Consignment_Note"].ToString(),
                             });
                         }
                     }
