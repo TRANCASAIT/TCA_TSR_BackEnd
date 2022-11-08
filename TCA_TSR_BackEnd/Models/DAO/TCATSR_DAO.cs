@@ -3,7 +3,6 @@ using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
 using static TCA_TSR_BackEnd.Models.Customer;
-using static TCA_TSR_BackEnd.Models.ServiceRequest;
 using static TCA_TSR_BackEnd.Models.User;
 
 namespace TCA_TSR_BackEnd.Models.DAO
@@ -221,42 +220,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 State_Id = Convert.ToInt32(item["State_Id"]),
                                 City_Name = item["City_Name"].ToString(),
                                 State_Name = item["State_Name"].ToString(),
-                                Creation_Date = item["Creation_Date"].ToString()
-                            });
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-            }
-            return cities;
-        }
-
-
-        public static List<City> GetCitiesFiltered(int stateId)
-        {
-            var spOption = 4;
-            List<City> cities = null;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    DataTable dt = bl.AddParam("@SPOption", spOption)
-                        .AddParam("@State_Id", stateId)
-                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CityProcedures]");
-                    if (dt.Rows.Count > 0)
-                    {
-                        cities = new List<City>();
-                        foreach (DataRow item in dt.Rows)
-                        {
-                            cities.Add(new City()
-                            {
-                                City_Id = Convert.ToInt32(item["City_Id"]),
-                                State_Id = Convert.ToInt32(item["State_Id"]),
-                                City_Name = item["City_Name"].ToString(),
                                 Creation_Date = item["Creation_Date"].ToString()
                             });
                         }
@@ -916,6 +879,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         public static Result UpdateUser(UserPut _obj)
         {
+            _obj.Password = GetSHA256(_obj.Password);
             Result result = new Result();
             var spOption = 2;
             using (var bl = new Business())
@@ -929,6 +893,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Name", _obj.Name)
                       .AddParam("@Last_Name", _obj.Last_Name)
                       .AddParam("@Email", _obj.Email)
+                      .AddParam("@Password", _obj.Password)
                       .AddParam("@UserType_Id", _obj.UserType_Id)
                       .AddParam("@Customer_Id", _obj.Customer_Id)
                       .AddParam("@User_Logged", _obj.User_Logged)
@@ -978,7 +943,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 UserName = item["UserName"].ToString(),
                                 Name = item["Name"].ToString(),
                                 Last_Name = item["Last_Name"].ToString(),
-                                Customer_Name = item["CustomerName"].ToString(),
                                 UserType_Id = Convert.ToInt32(item["UserType_Id"]),
                                 Customer_Id = Convert.ToInt32(item["Customer_Id"]),
                                 UserType_Name = item["UserType_Name"].ToString(),
@@ -1037,7 +1001,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         public static User GetUserLogin(string userName, string password)
         {
-            Result result = new Result();
             var spOption = 5;
             User _user = new User();
             using (var bl = new Business())
@@ -1046,8 +1009,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                    .AddParam("@SpOption", spOption)
                                    .AddParam("@UserName", userName)
                                    .AddParam("@Password", password)
-                                   .AddParam("@StatusOut", DBNull.Value, true, 100)
-                                   .AddParam("@MessageOut", DBNull.Value, true, 300)
                                    .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
 
                 if (dtHeader.Rows.Count > 0)
@@ -1058,57 +1019,14 @@ namespace TCA_TSR_BackEnd.Models.DAO
                     _user.UserType_Name = dtHeader.Rows[0]["UserType_Name"].ToString();
                     _user.UserType_Id = Convert.ToInt32(dtHeader.Rows[0]["UserType_Id"]); 
                     _user.Status = Convert.ToBoolean(dtHeader.Rows[0]["Status"]);
-                    _user.IsCustomer = Convert.ToBoolean(dtHeader.Rows[0]["IsCustomer"]);
-                }
-                else
-                {
-                    _user.StatusOut = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                    _user.MessageOut = bl.GetParamValue("@MessageOut").ToString();
                 }
             }
             return _user;
         }
 
-
-        public static Result logOut(int User_Id)
-        {
-            Result result = new Result();
-            var spOption = 6;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    bl
-                      .AddParam("@SpOption", spOption)
-                      .AddParam("@User_Id", User_Id)
-                      .AddParam("@StatusOut", DBNull.Value, true, 100)
-                      .AddParam("@MessageOut", DBNull.Value, true, 300)
-                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
-
-                    if (bl.Exception != null)
-                    {
-                        result.State = 1;
-                        result.Message = bl.Exception;
-                    }
-                    else
-                    {
-                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
-                        result.Message = bl.GetParamValue("@MessageOut").ToString();
-                    }
-
-                }
-                catch (SqlException ex)
-                {
-                    result.State = ex.State;
-                    result.Message = ex.Message;
-                }
-            }
-            return result;
-        }
         #endregion
 
         #region Customer
-
         public static Result StoreCustomer(CustomerPost _obj)
         {
             Result result = new Result();
@@ -1222,8 +1140,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                             customers.Add(new Customer()
                             {
                                 Customer_Id = Convert.ToInt32(item["Customer_Id"]),
-                                State_Id = Convert.ToInt32(item["State_Id"]),
-                                City_Id = Convert.ToInt32(item["City_Id"]),
                                 Name = item["Name"].ToString(),
                                 RFC = item["RFC"].ToString(),
                                 Street = item["Street"].ToString(),
@@ -1284,51 +1200,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 }
             }
             return result;
-        }
-
-        public static List<Customer> GetCustomersActive()
-        {
-            var spOption = 5;
-            List<Customer> customers = null;
-            using (var bl = new Business())
-            {
-                try
-                {
-                    DataTable dt = bl.AddParam("@SPOption", spOption)
-                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CustomerProcedures]");
-                    if (dt.Rows.Count > 0)
-                    {
-                        customers = new List<Customer>();
-                        foreach (DataRow item in dt.Rows)
-                        {
-                            customers.Add(new Customer()
-                            {
-                                Customer_Id = Convert.ToInt32(item["Customer_Id"]),
-                                State_Id = Convert.ToInt32(item["State_Id"]),
-                                City_Id = Convert.ToInt32(item["City_Id"]),
-                                Name = item["Name"].ToString(),
-                                RFC = item["RFC"].ToString(),
-                                Street = item["Street"].ToString(),
-                                StreetExt = item["Street_Ext_Number"].ToString(),
-                                StreetInt = item["Street_Int_Number"].ToString(),
-                                ZipCode = item["ZipCode"].ToString(),
-                                Suburb = item["Suburb"].ToString(),
-                                PhoneNumber = item["PhoneNumber"].ToString(),
-                                State_Name = item["State_Name"].ToString(),
-                                City_Name = item["City_Name"].ToString(),
-                                Email = item["Email"].ToString(),
-                                Status = Convert.ToBoolean(item["Status"]),
-                                Creation_Date = item["Creation_Date"].ToString()
-                            });
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-            return customers;
         }
 
         //public static Customer GetCustomerLogin(string customerName, string password)
