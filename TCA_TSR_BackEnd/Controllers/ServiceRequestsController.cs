@@ -2,6 +2,7 @@
 using TCA_TSR_BackEnd.Models.DAO;
 using TCA_TSR_BackEnd.Models;
 using static TCA_TSR_BackEnd.Models.ServiceRequest;
+using Microsoft.AspNetCore.StaticFiles;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,7 +22,7 @@ namespace TCA_TSR_BackEnd.Controllers
         }
 
         [HttpPost("UploadFile")]
-        public async Task<IActionResult> PostFiles([FromForm] UploadFiles uf)
+        public async Task<IActionResult> PostFiles([FromForm] UploadFile uf)
         {
             Result result = new Result();
             if (uf.Document_Id > 0 && uf.ServiceRequest_Id > 0 && uf.Document_Type > 0)
@@ -34,12 +35,10 @@ namespace TCA_TSR_BackEnd.Controllers
                 }
                 else
                 {
-                    if (uf.Document_Type == 1 || uf.Document_Type == 2 || uf.Document_Type == 3 || uf.Document_Type == 4 || uf.Document_Type == 5 || uf.Document_Type == 6 || uf.Document_Type == 8 || uf.Document_Type ==9)
+                    if (uf.Document_Type == 1 || uf.Document_Type == 2 || uf.Document_Type == 3 || uf.Document_Type == 4 || uf.Document_Type == 5 || uf.Document_Type == 6 || uf.Document_Type == 8 || uf.Document_Type == 9)
                     {
-
-                        //var filepath = @"App_Data/ServiceRequest-" + Convert.ToString(uf.ServiceRequest_Id) + "/Document-" + Convert.ToString(uf.Document_Id) + "/FileType-" + Convert.ToString(uf.Document_Type) + "/" + Convert.ToString(uf.ServiceRequest_Id) + "_" + Convert.ToString(uf.Document_Id) + "_" + Convert.ToString(uf.Document_Type) + ".pdf";
-                        //System.IO.File.Delete(filepathDel);
-                        var filePath = Path.Combine(@"App_Data/ServiceRequest/" + Convert.ToString(uf.ServiceRequest_Id) + "/Document/" + Convert.ToString(uf.Document_Id) + "/FileType/" + Convert.ToString(uf.Document_Type) + "/" + Convert.ToString(uf.ServiceRequest_Id) + "_" + Convert.ToString(uf.Document_Id) + "_" + Convert.ToString(uf.Document_Type) + ".pdf");
+                        
+                        var filePath = Path.Combine(@"App_Data/Solicitudes/" + "SR-"+ Convert.ToString(uf.ServiceRequest_Id) + "/Documents/" + "DC-" +Convert.ToString(uf.Document_Id) + "/File-" + Convert.ToString(uf.Document_Type) + "/" + uf.DocumentFile.FileName);
                         new FileInfo(filePath).Directory?.Create();
                         await using (var stream = new FileStream(filePath, FileMode.Create))
                         {
@@ -47,6 +46,9 @@ namespace TCA_TSR_BackEnd.Controllers
                             await uf.DocumentFile.CopyToAsync(stream);
                             _logger.LogInformation($"\t The uploaded file is saved as [{filePath}].");
                         }
+
+                        result = TCATSR_DAO.UploadFile(uf, filePath, uf.DocumentFile.FileName);
+
                     }
                     else if(uf.Document_Type == 7)
                     {
@@ -54,13 +56,13 @@ namespace TCA_TSR_BackEnd.Controllers
                         {
                             result.State = 1;
                             result.Message = "Este documento no es formato XML";
-                            return Ok(result);
+                            return Ok(result); //TODO: Verificar que si entre a este punto
                         }
                         else
                         {
-                            var filepathDel = @"App_Data/ServiceRequest-" + Convert.ToString(uf.ServiceRequest_Id) + "/Document-" + Convert.ToString(uf.Document_Id) + "/FileType-" + Convert.ToString(uf.Document_Type) + "/"+ Convert.ToString(uf.ServiceRequest_Id) + "_" + Convert.ToString(uf.Document_Id) + "_" + Convert.ToString(uf.Document_Type) + ".xml";
-                            System.IO.File.Delete(filepathDel);
-                            var filePath = Path.Combine(@"App_Data/Archivo", $"{uf.DocumentFile.FileName}");
+                            //var filepathDel = @"App_Data / Solicitudes / " + "SR - "+ Convert.ToString(uf.ServiceRequest_Id) + " / Documents / " + "DC - " +Convert.ToString(uf.Document_Id) + " / File - " + Convert.ToString(uf.Document_Type) + " / " + uf.DocumentFile.FileName;
+                            //System.IO.File.Delete(filepathDel);
+                            var filePath = Path.Combine(@"App_Data/Solicitudes/ " + "SR- " + Convert.ToString(uf.ServiceRequest_Id) + "/Documents/ " + "DC-" + Convert.ToString(uf.Document_Id) + "/File-" + Convert.ToString(uf.Document_Type) + "/" + uf.DocumentFile.FileName);
                             new FileInfo(filePath).Directory?.Create();
                             await using (var stream = new FileStream(filePath, FileMode.Create))
                             {
@@ -71,7 +73,6 @@ namespace TCA_TSR_BackEnd.Controllers
                         }
                     }
                 }
-                //result = TCATSR_DAO.StoreServiceRequest(uf);
                 return Ok(result);
             }
             else
@@ -81,6 +82,32 @@ namespace TCA_TSR_BackEnd.Controllers
                 return Ok(result);
             }
         }
+
+        [HttpPost("DownloadFile")]
+        public async Task<ActionResult> DownloadFile(DownloadFile df)
+        {
+            // validation and get the file
+            Result result = new Result();
+            //var filePath = $"{id}.txt";
+            var filePath = Path.Combine(df.Url);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                result.Message = "El archivo no existe";
+                result.State = 1;
+                return Ok(result);
+            }
+
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out var contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            var filname = Path.GetFileName(filePath);
+            var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            return File(bytes, contentType, Path.GetFileName(filePath));
+        }
+    
 
         // GET: api/<ServiceRequestsController>
         [HttpGet("GetServiceRequests")]
@@ -99,10 +126,10 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
-        [HttpGet("GetServiceRequestsFull")]
-        public IActionResult GetSRFull()
-        {
-            List<ServiceRequest> sr = TCATSR_DAO.GetServiceRequestsFull();
+         [HttpGet("GetServiceRequestsFull/{srId}")]
+         public IActionResult GetSRFull(int srId)
+         {
+            List<ServiceRequest> sr = TCATSR_DAO.GetServiceRequestsFull(srId);
             if (sr != null)
             {
                 return Ok(sr);
@@ -113,7 +140,7 @@ namespace TCA_TSR_BackEnd.Controllers
                 result.NumberRecords = 0;
                 return Ok(result);
             }
-        }
+         }
 
 
         // POST api/<ServiceRequestsController>
@@ -152,6 +179,24 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
+
+
+        [HttpPost("setConsigmentNote")]
+        public IActionResult PostInvoiceNumber([FromBody] setConsigmentNote sr)
+        {
+            Result result = new Result();
+            if (sr.ServiceRequest_Id > 0 && sr.User_Logged.Length > 0 && sr.Consigment_Note.Length > 0 && sr.Document_Id > 0)
+            {
+                result = TCATSR_DAO.setConsigmentNote(sr);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
+        }
 
     }
 }

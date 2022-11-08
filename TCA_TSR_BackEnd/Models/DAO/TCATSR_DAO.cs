@@ -1373,8 +1373,45 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Stops_Id", sr.Stops_Id)
                       .AddParam("@User_Logged", sr.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@Identificador", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                        result.Identificador = Convert.ToInt32(bl.GetParamValue("@Identificador"));
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+
+        public static Result testFile(string sr)
+        {
+            Result result = new Result();
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@ruta", sr)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CreateRoute]");
 
                     if (bl.Exception != null)
                     {
@@ -1397,9 +1434,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-
-
-        
 
 
         public static List<ServiceRequest> GetServiceRequests()
@@ -1469,7 +1503,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
 
 
-        public static List<ServiceRequest> GetServiceRequestsFull()
+        public static List<ServiceRequest> GetServiceRequestsFull(int srId)
         {
             var spOption = 4;
             List<ServiceRequest> sr = null;
@@ -1478,6 +1512,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 try
                 {
                     DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .AddParam("@ServiceRequest_Id",srId)
                         .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
                     if (dt.Rows.Count > 0)
                     {
@@ -1502,25 +1537,52 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 Reference = item["Reference"].ToString(),
                                 Status_Id = Convert.ToInt32(item["Status_Id"]),
                                 Status_Description = item["Status_Description"].ToString(),
+                                InvoiceMXCompleted = Convert.ToBoolean(item["InvoiceMXCompleted"]),
                                 InvoiceMXStatus = Convert.ToBoolean(item["InvoiceMXStatus"]),
                                 InvoiceMX = item["InvoiceMX"].ToString(),
+                                InvMXFN = item["InvMXFN"].ToString(),
+                                InvMXdtm = item["InvMXdtm"].ToString(),
+                                InvoiceUSACompleted = Convert.ToBoolean(item["InvoiceUSACompleted"]),
                                 InvoiceUSAStatus = Convert.ToBoolean(item["InvoiceUSAStatus"]),
                                 InvoiceUSA = item["InvoiceUSA"].ToString(),
+                                InvUSAFN = item["InvUSAFN"].ToString(),
+                                InvUSAdtm = item["InvUSAdtm"].ToString(),
+                                BolCompleted = Convert.ToBoolean(item["BolCompleted"]),
                                 BOLStatus = Convert.ToBoolean(item["BOLStatus"]),
                                 BOL = item["BOL"].ToString(),
+                                BolFN = item["BolFN"].ToString(),
+                                Boldtm = item["Boldtm"].ToString(),
+                                InwardCompleted = Convert.ToBoolean(item["InwardCompleted"]),
                                 InwardStatus = Convert.ToBoolean(item["InwardStatus"]),
                                 Inward = item["Inward"].ToString(),
+                                InwFN = item["InwFN"].ToString(),
+                                Inwdtm = item["Inwdtm"].ToString(),
+                                AceCompleted = Convert.ToBoolean(item["AceCompleted"]),
                                 ACEStatus = Convert.ToBoolean(item["ACEStatus"]),
                                 ACE = item["ACE"].ToString(),
+                                AceFN = item["AceFN"].ToString(),
+                                Acedtm = item["Acedtm"].ToString(),
+                                LayoutCompleted = Convert.ToBoolean(item["LayoutCompleted"]),
                                 LayoutStatus = Convert.ToBoolean(item["LayoutStatus"]),
                                 Layout = item["Layout"].ToString(),
+                                LayoutFN = item["LayoutFN"].ToString(),
+                                Layoutdtm = item["Layoutdtm"].ToString(),
                                 Accepted_Layout = Convert.ToBoolean(item["Accepted_Layout"]),
+                                XmlCompleted = Convert.ToBoolean(item["XmlCompleted"]),
                                 XmlStatus = Convert.ToBoolean(item["XmlStatus"]),
                                 XML = item["XML"].ToString(),
+                                XmlFN = item["XmlFN"].ToString(),
+                                Xmldtm = item["Xmldtm"].ToString(),
+                                OriginalPDFCompleted = Convert.ToBoolean(item["OriginalPDFCompleted"]),
                                 OriginPdfStatus = Convert.ToBoolean(item["OriginPdfStatus"]),
                                 OriginalPDF = item["OriginalPDF"].ToString(),
+                                OPdfFN = item["OPdfFN"].ToString(),
+                                OPdfdtm = item["OPdfdtm"].ToString(),
+                                OperationsPDFCompleted = Convert.ToBoolean(item["OperationsPDFCompleted"]),
                                 OPStatus = Convert.ToBoolean(item["OPStatus"]),
                                 OperationsPDF = item["OperationsPDF"].ToString(),
+                                OpPdfFN = item["OpPdfFN"].ToString(),
+                                OpPdfdtm = item["OpPdfdtm"].ToString(),
                             });
                         }
                     }
@@ -1548,6 +1610,89 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@SpOption", spOption)
                       .AddParam("@ServiceRequest_Id", sr.ServiceRequest_Id)
                       .AddParam("@TMWOrder", sr.TMWOrder)
+                      .AddParam("@User_Logged", sr.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        
+
+        public static Result UploadFile(UploadFile sr, string path, string fileName)
+        {
+            Result result = new Result();
+            int spOption = 6;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", sr.ServiceRequest_Id)
+                      .AddParam("@Document_Id", sr.Document_Id)
+                      .AddParam("@DocumentType", sr.Document_Type)
+                      .AddParam("@FileName", fileName)
+                      .AddParam("@Path", path)
+                      .AddParam("@User_Logged", sr.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+
+        public static Result setConsigmentNote(setConsigmentNote sr)
+        {
+            Result result = new Result();
+            int spOption = 7;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", sr.ServiceRequest_Id)
+                      .AddParam("@Document_Id", sr.Document_Id)
+                      .AddParam("@Consigment_Note", sr.Consigment_Note)
                       .AddParam("@User_Logged", sr.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)

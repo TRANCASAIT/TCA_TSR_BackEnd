@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Folder Include="App_Data\Solicitudes\" />
+    <Folder Include="App_Data\Solicitudes\SR-1\Documents\DC-1\File-6\" />
   </ItemGroup>
 
 </Project>

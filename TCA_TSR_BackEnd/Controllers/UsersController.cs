@@ -6,8 +6,6 @@ using static TCA_TSR_BackEnd.Models.Customer;
 using System.Text;
 using System.Security.Cryptography;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace TCA_TSR_BackEnd.Controllers
 {
     [Route("api/[controller]")]
@@ -133,5 +131,6 @@ namespace TCA_TSR_BackEnd.Controllers
             for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
             return sb.ToString();
         }
+
     }
 }
