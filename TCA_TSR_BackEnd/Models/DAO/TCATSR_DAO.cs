@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
 using static TCA_TSR_BackEnd.Models.Customer;
+using static TCA_TSR_BackEnd.Models.ServiceRequest;
 using static TCA_TSR_BackEnd.Models.User;
 
 namespace TCA_TSR_BackEnd.Models.DAO
@@ -880,6 +881,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         public static Result UpdateUser(UserPut _obj)
         {
             var spOption = 2;
+            Result result = new Result();
             using (var bl = new Business())
             {
                 try
