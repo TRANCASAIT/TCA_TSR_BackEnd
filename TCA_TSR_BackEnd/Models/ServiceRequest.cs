@@ -65,6 +65,8 @@
         public string OpPdfFN { get; set; }
         public string OpPdfdtm { get; set; }
         public bool OperationsPDFCompleted { get; set; }
+        public bool Accepted_LayoutDC { get; set; }
+        public bool NotAccepted_LayoutDC { get; set; }
 
         public class ServiceRequestPost
         {
@@ -113,6 +115,15 @@
             public int ServiceRequest_Id { get; set; }
             public int Document_Id { get; set; }
             public string Consigment_Note { get; set; }
+            public string User_Logged { get; set; }
+        }
+
+        public class LayoutStatusDC
+        {
+            public int ServiceRequest_Id { get; set; }
+            public int Document_Id { get; set; }
+            public bool Accepted_LayoutDC { get; set; }
+            public bool NotAccepted_LayoutDC { get; set; }
             public string User_Logged { get; set; }
         }
     }

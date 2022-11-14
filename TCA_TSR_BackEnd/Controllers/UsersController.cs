@@ -86,7 +86,7 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
-        [HttpPost("PostUserLogin")]
+       [HttpPost("PostUserLogin")]
         public IActionResult Login(UserLogin us)
         {
             var _password = GetSHA256(us.Password);

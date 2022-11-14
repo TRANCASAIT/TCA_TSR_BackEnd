@@ -14,6 +14,7 @@
         public string Creation_Date { get; set; }
         public bool Status { get; set; }
         public bool IsCustomer { get; set; }
+        public bool IsLogged { get; set; }
         public int StatusOut { get; set; }
         public string MessageOut { get; set; }
 

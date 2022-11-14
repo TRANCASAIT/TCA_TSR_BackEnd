@@ -3,6 +3,7 @@ using TCA_TSR_BackEnd.Models.DAO;
 using TCA_TSR_BackEnd.Models;
 using static TCA_TSR_BackEnd.Models.ServiceRequest;
 using Microsoft.AspNetCore.StaticFiles;
+using static TCA_TSR_BackEnd.Models.Comment;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -227,6 +228,58 @@ namespace TCA_TSR_BackEnd.Controllers
                 result.State = 1;
                 result.Message = "Verifique los datos";
                 return Ok(result);
+            }
+        }
+
+
+        [HttpPost("sendComment")]
+        public IActionResult PostComment(CommentPost cp)
+        {
+            Result result = new Result();
+            if(cp.Document_Id > 0 && cp.ServiceRequest_Id > 0 && cp.Comment_Body.Length > 0 && cp.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.sendComment(cp);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
+        }
+
+        [HttpGet("GetComments/{id}")]
+        public IActionResult GetComments(int id)
+        {
+            List<Comment> lstComments = TCATSR_DAO.GetComments(id);
+            if(lstComments != null)
+            {
+                return Ok(lstComments);
+            }
+            else
+            {
+                Result result = new Result();
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok(result);
+            }
+        }
+
+        [HttpPut("LayoutStatusDC")]
+        public IActionResult LayoutStatus(LayoutStatusDC lay)
+        {
+            Result result = new Result();
+            if(lay.ServiceRequest_Id > 0 && lay.Document_Id > 0 && lay.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.SetLayoutStateDC(lay);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
             }
         }
 

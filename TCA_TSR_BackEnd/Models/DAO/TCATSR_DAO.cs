@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
+using static TCA_TSR_BackEnd.Models.Comment;
 using static TCA_TSR_BackEnd.Models.Customer;
 using static TCA_TSR_BackEnd.Models.ServiceRequest;
 using static TCA_TSR_BackEnd.Models.User;
@@ -980,8 +981,10 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 UserType_Id = Convert.ToInt32(item["UserType_Id"]),
                                 Customer_Id = Convert.ToInt32(item["Customer_Id"]),
                                 UserType_Name = item["UserType_Name"].ToString(),
+                                Customer_Name = item["CustomerName"].ToString(),
                                 Email = item["Email"].ToString(),
                                 Status = Convert.ToBoolean(item["Status"]),
+                                IsLogged = Convert.ToBoolean(item["IsLogged"]),
                                 Creation_Date = item["Creation_Date"].ToString()
                             });
                         }
@@ -1035,6 +1038,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
 
         public static User GetUserLogin(string userName, string password)
         {
+            Result result = new Result();
             var spOption = 5;
             User _user = new User();
             using (var bl = new Business())
@@ -1043,6 +1047,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                    .AddParam("@SpOption", spOption)
                                    .AddParam("@UserName", userName)
                                    .AddParam("@Password", password)
+                                   .AddParam("@StatusOut", DBNull.Value, true, 100)
+                                   .AddParam("@MessageOut", DBNull.Value, true, 300)
                                    .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
 
                 if (dtHeader.Rows.Count > 0)
@@ -1051,12 +1057,19 @@ namespace TCA_TSR_BackEnd.Models.DAO
                     _user.Email = dtHeader.Rows[0]["Email"].ToString();
                     _user.UserName = dtHeader.Rows[0]["UserName"].ToString();
                     _user.UserType_Name = dtHeader.Rows[0]["UserType_Name"].ToString();
-                    _user.UserType_Id = Convert.ToInt32(dtHeader.Rows[0]["UserType_Id"]); 
+                    _user.UserType_Id = Convert.ToInt32(dtHeader.Rows[0]["UserType_Id"]);
                     _user.Status = Convert.ToBoolean(dtHeader.Rows[0]["Status"]);
+                    _user.IsCustomer = Convert.ToBoolean(dtHeader.Rows[0]["IsCustomer"]);
+                }
+                else
+                {
+                    _user.StatusOut = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                    _user.MessageOut = bl.GetParamValue("@MessageOut").ToString();
                 }
             }
             return _user;
         }
+
 
         public static Result logOut(int User_Id)
         {
@@ -1359,7 +1372,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Stops_Id", sr.Stops_Id)
                       .AddParam("@User_Logged", sr.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
-                      .AddParam("@Identificador", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
 
@@ -1372,7 +1384,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                     {
                         result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
                         result.Message = bl.GetParamValue("@MessageOut").ToString();
-                        result.Identificador = Convert.ToInt32(bl.GetParamValue("@Identificador"));
                     }
 
                 }
@@ -1570,6 +1581,9 @@ namespace TCA_TSR_BackEnd.Models.DAO
                                 OpPdfFN = item["OpPdfFN"].ToString(),
                                 OpPdfdtm = item["OpPdfdtm"].ToString(),
                                 Consigment_Note = item["Consignment_Note"].ToString(),
+                                Accepted_LayoutDC = Convert.ToBoolean(item["Accepted_LayoutDC"]),
+                                NotAccepted_LayoutDC = Convert.ToBoolean(item["NotAccepted_LayoutDC"]),
+
                             });
                         }
                     }
@@ -1623,7 +1637,44 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
+        public static Result sendComment(CommentPost com)
+        {
+            Result result = new Result();
+            int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", com.ServiceRequest_Id)
+                      .AddParam("@Document_Id", com.Document_Id)
+                      .AddParam("@Comment_Body", com.Comment_Body)
+                      .AddParam("@User_Logged", com.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[CommentsProcedures]");
 
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
 
         public static Result UploadFile(UploadFile sr, string path, string fileName)
         {
@@ -1719,6 +1770,83 @@ namespace TCA_TSR_BackEnd.Models.DAO
                       .AddParam("@Document_Id", sr.Document_Id)
                       .AddParam("@Consigment_Note", sr.Consigment_Note)
                       .AddParam("@User_Logged", sr.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<Comment> GetComments(int doc)
+        {
+            var spOption = 2;
+            List<Comment> comments = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SpOption", spOption)
+                        .AddParam("@Document_Id",doc)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[CommentsProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        comments = new List<Comment>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            comments.Add(new Comment()
+                            {
+                                Comment_Id = Convert.ToInt32(item["Comment_Id"]),
+                                Document_Id = Convert.ToInt32(item["Document_Id"]),
+                                ServiceRequest_Id = Convert.ToInt32(item["ServiceRequest_Id"]),
+                                Comment_Body = item["Comment_Body"].ToString(),
+                                UserName = item["UserName"].ToString(),
+                                User_Id = Convert.ToInt32(item["User_Id"]),
+                                Creation_Date = item["Creation_Date"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return comments;
+        }
+
+        public static Result SetLayoutStateDC(LayoutStatusDC layout)
+        {
+            Result result = new Result();
+            int spOption = 10;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", layout.ServiceRequest_Id)
+                      .AddParam("@Document_Id", layout.Document_Id)
+                      .AddParam("@Accepted_LayoutDC", layout.Accepted_LayoutDC)
+                      .AddParam("@NotAccepted_LayoutDC", layout.NotAccepted_LayoutDC)
+                      .AddParam("@User_Logged", layout.User_Logged)
                       .AddParam("@StatusOut", DBNull.Value, true, 100)
                       .AddParam("@MessageOut", DBNull.Value, true, 300)
                       .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
