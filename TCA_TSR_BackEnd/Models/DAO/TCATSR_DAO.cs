@@ -1222,6 +1222,8 @@ namespace TCA_TSR_BackEnd.Models.DAO
                             customers.Add(new Customer()
                             {
                                 Customer_Id = Convert.ToInt32(item["Customer_Id"]),
+                                City_Id = Convert.ToInt32(item["City_Id"]),
+                                State_Id = Convert.ToInt32(item["State_Id"]),
                                 Name = item["Name"].ToString(),
                                 RFC = item["RFC"].ToString(),
                                 Street = item["Street"].ToString(),
@@ -1873,6 +1875,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
         }
 
         #endregion
+
         #region Methods
         public static string GetSHA256(string str)
         {
