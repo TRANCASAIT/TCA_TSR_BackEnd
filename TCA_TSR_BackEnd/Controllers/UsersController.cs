@@ -68,7 +68,6 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
-
         [HttpPut("UserPutState")]
         public IActionResult PutStatus(UserPutStatus userPutStatus)
         {
@@ -120,6 +119,8 @@ namespace TCA_TSR_BackEnd.Controllers
                 return Ok(result);
             }
         }
+
+
 
         public static string GetSHA256(string str)
         {

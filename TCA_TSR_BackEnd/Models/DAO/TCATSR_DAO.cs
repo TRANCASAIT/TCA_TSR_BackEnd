@@ -903,7 +903,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
                         result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
                         result.Message = bl.GetParamValue("@MessageOut").ToString();
                     }
-
                 }
                 catch (SqlException ex)
                 {
@@ -922,20 +921,44 @@ namespace TCA_TSR_BackEnd.Models.DAO
             {
                 try
                 {
-                    bl
-                      .AddParam("@SpOption", spOption)
-                      .AddParam("@User_Id", _obj.User_Id)
-                      .AddParam("@UserName", _obj.UserName)
-                      .AddParam("@Name", _obj.Name)
-                      .AddParam("@Last_Name", _obj.Last_Name)
-                      .AddParam("@Email", _obj.Email)
-                      .AddParam("@UserType_Id", _obj.UserType_Id)
-                      .AddParam("@Customer_Id", _obj.Customer_Id)
-                      .AddParam("@User_Logged", _obj.User_Logged)
-                      .AddParam("@StatusOut", DBNull.Value, true, 100)
-                      .AddParam("@MessageOut", DBNull.Value, true, 300)
-                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+                    if (_obj.Password.Length > 0 && _obj.UserType_Name == "SA")
+                    {
+                        spOption = 7;
+                        _obj.Password = GetSHA256(_obj.Password);
+                        bl
+                        .AddParam("@SpOption", spOption)
+                        .AddParam("@User_Id", _obj.User_Id)
+                        .AddParam("@UserName", _obj.UserName)
+                        .AddParam("@Name", _obj.Name)
+                        .AddParam("@Last_Name", _obj.Last_Name)
+                        .AddParam("@Email", _obj.Email)
+                        .AddParam("@UserType_Id", _obj.UserType_Id)
+                        .AddParam("@Password", _obj.Password)
+                        .AddParam("@Customer_Id", _obj.Customer_Id)
+                        .AddParam("@User_Logged", _obj.User_Logged)
+                        .AddParam("@StatusOut", DBNull.Value, true, 100)
+                        .AddParam("@MessageOut", DBNull.Value, true, 300)
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
+                    }
+                    else
+                    {
+                        spOption = 2;
+                        bl
+                        .AddParam("@SpOption", spOption)
+                        .AddParam("@User_Id", _obj.User_Id)
+                        .AddParam("@UserName", _obj.UserName)
+                        .AddParam("@Name", _obj.Name)
+                        .AddParam("@Last_Name", _obj.Last_Name)
+                        .AddParam("@Email", _obj.Email)
+                        .AddParam("@UserType_Id", _obj.UserType_Id)
+                        .AddParam("@Customer_Id", _obj.Customer_Id)
+                        .AddParam("@User_Logged", _obj.User_Logged)
+                        .AddParam("@StatusOut", DBNull.Value, true, 100)
+                        .AddParam("@MessageOut", DBNull.Value, true, 300)
+                        .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[UserProcedures]");
 
+                        
+                    }
                     if (bl.Exception != null)
                     {
                         result.State = 1;
@@ -1398,7 +1421,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-
         public static Result testFile(string sr)
         {
             Result result = new Result();
@@ -1433,9 +1455,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
             return result;
         }
 
-
-
-        public static List<ServiceRequest> GetServiceRequests()
+        public static List<ServiceRequest> GetServiceRequests(int usid)
         {
             var spOption = 3;
             List<ServiceRequest> sr = null;
@@ -1444,6 +1464,7 @@ namespace TCA_TSR_BackEnd.Models.DAO
                 try
                 {
                     DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .AddParam("@User_Id", usid)
                         .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
                     if (dt.Rows.Count > 0)
                     {
@@ -1499,8 +1520,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
             }
             return sr;
         }
-
-
 
         public static List<ServiceRequest> GetServiceRequestsFull(int srId)
         {
@@ -1598,8 +1617,6 @@ namespace TCA_TSR_BackEnd.Models.DAO
             }
             return sr;
         }
-
-
 
         public static Result setTMWOrder(setTMW sr)
         {
@@ -1873,6 +1890,369 @@ namespace TCA_TSR_BackEnd.Models.DAO
             }
             return result;
         }
+
+
+        public static Result DeleteServiceRequest(int ServiceRequest_Id)
+        {
+            Result result = new Result();
+            int spOption = 11;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", ServiceRequest_Id)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+
+        public static Result setPriority(setPriority priority)
+        {
+            Result result = new Result();
+            int spOption = 12;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", priority.ServiceRequest_Id)
+                      .AddParam("@Priority", priority.Priority)
+                      .AddParam("@User_Logged", priority.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result updateBoxNumber(updateBoxNumber boxNumber)
+        {
+            Result result = new Result();
+            int spOption = 13;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", boxNumber.ServiceRequest_Id)
+                      .AddParam("@Box_Number", boxNumber.Box_Number)
+                      .AddParam("@User_Logged", boxNumber.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static Result updateOperationType(updateOperationType opt)
+        {
+            Result result = new Result();
+            int spOption = 14;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      .AddParam("@SpOption", spOption)
+                      .AddParam("@ServiceRequest_Id", opt.ServiceRequest_Id)
+                      .AddParam("@OperationType_Id", opt.OperationType_Id)
+                      .AddParam("@User_Logged", opt.User_Logged)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public static List<ServiceReport> GetReport()
+        {
+            var spOption = 15;
+            List<ServiceReport> sr = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        sr = new List<ServiceReport>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            sr.Add(new ServiceReport()
+                            {
+                                ServiceRequest_Id = Convert.ToInt32(item["InvoiceNumber"]),
+                                Document_Id = Convert.ToInt32(item["Document_Id"]),
+                                CustomerName = item["CustomerName"].ToString(),
+                                Box_Number = item["Box_Number"].ToString(),
+                                OperationType_Name = item["OperationType_Name"].ToString(),
+                                Stop_Number = Convert.ToInt32(item["Stop_Number"]),
+                                Creation_Date = item["Creation_Date"].ToString(),
+                                TMWOrder = item["TMWOrder"].ToString(),
+                                Status_Description = item["Status_Description"].ToString(),
+                                Inward = item["Inward"].ToString(),
+                                ACE = item["ACE"].ToString(),
+                                Layout = item["Layout"].ToString(),
+                                Accepted_By = item["Accepted_By"].ToString(),
+                                LayoutAccepteddtm = item["LayoutAccepteddtm"].ToString(),
+                                Consignment_Note = item["Consignment_Note"].ToString(),
+                                XML = item["XML"].ToString(),
+                                OriginalPDF = item["OriginalPDF"].ToString(),
+                                OperationsPDF = item["OperationsPDF"].ToString(),
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return sr;
+        }
+
+
+        public static List<ServiceRequest> GetServiceFilter(ServiceFilter ser)
+        {
+            var spOption = 9;
+            List<ServiceRequest> sr = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .AddParam("@Status_Id",ser.Status_Id)
+                        .AddParam("@OperationType_Id", ser.OperationType_Id)
+                        .AddParam("@StartDate", ser.StartDate)
+                        .AddParam("@EndDate", ser.EndDate)
+                        .AddParam("@InvoiceNumber", ser.InvoiceNumber)
+                        .AddParam("@Box_Number", ser.Box_Number)
+                        .AddParam("@Customer_Id", ser.Customer_Id)
+                        .AddParam("@Priority",ser.Priority)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        sr = new List<ServiceRequest>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            sr.Add(new ServiceRequest()
+                            {
+                                ServiceRequest_Id = Convert.ToInt32(item["ServiceRequest_Id"]),
+                                Priority = Convert.ToBoolean(item["Priority"]),
+                                InvoiceNumber = Convert.ToInt32(item["InvoiceNumber"]),
+                                Customer_Id = Convert.ToInt32(item["Customer_Id"]),
+                                CustomerName = item["CustomerName"].ToString(),
+                                Box_Number = item["Box_Number"].ToString(),
+                                OperationType_Id = Convert.ToInt32(item["OperationType_Id"]),
+                                OperationType_Name = item["OperationType_Name"].ToString(),
+                                Stop_Id = Convert.ToInt32(item["Stop_Id"]),
+                                Stop_Number = Convert.ToInt32(item["Stop_Number"]),
+                                Creation_Date = item["Creation_Date"].ToString(),
+                                TMWOrder = item["TMWOrder"].ToString(),
+                                Reference = item["Reference"].ToString(),
+                                Status_Id = Convert.ToInt32(item["Status_Id"]),
+                                Status_Description = item["Status_Description"].ToString(),
+                                InvoiceMXStatus = Convert.ToBoolean(item["InvoiceMXStatus"]),
+                                InvoiceUSAStatus = Convert.ToBoolean(item["InvoiceUSAStatus"]),
+                                BOLStatus = Convert.ToBoolean(item["BOLStatus"]),
+                                InwardStatus = Convert.ToBoolean(item["InwardStatus"]),
+                                ACEStatus = Convert.ToBoolean(item["ACEStatus"]),
+                                LayoutStatus = Convert.ToBoolean(item["LayoutStatus"]),
+                                Accepted_Layout = Convert.ToBoolean(item["Accepted_Layout"]),
+                                XmlStatus = Convert.ToBoolean(item["XmlStatus"]),
+                                OriginPdfStatus = Convert.ToBoolean(item["OriginPdfStatus"]),
+                                OPStatus = Convert.ToBoolean(item["OPStatus"]),
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return sr;
+        }
+
+
+        public static List<ServiceReport> GetServiceReportFilter(ServiceReportFilter ser)
+        {
+            var spOption = 16;
+            List<ServiceReport> sr = null;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    DataTable dt = bl.AddParam("@SPOption", spOption)
+                        .AddParam("@Status_Id", ser.Status_Id)
+                        .AddParam("@OperationType_Id", ser.OperationType_Id)
+                        .AddParam("@StartDate", ser.StartDate)
+                        .AddParam("@EndDate", ser.EndDate)
+                        .AddParam("@InvoiceNumber", ser.InvoiceNumber)
+                        .AddParam("@Box_Number", ser.Box_Number)
+                        .ProcedureDataTable(Business.DBConn.ServidorLocal, "[Request].[ServiceRequestProcedures]");
+                    if (dt.Rows.Count > 0)
+                    {
+                        sr = new List<ServiceReport>();
+                        foreach (DataRow item in dt.Rows)
+                        {
+                            sr.Add(new ServiceReport()
+                            {
+                                ServiceRequest_Id = Convert.ToInt32(item["InvoiceNumber"]),
+                                Document_Id = Convert.ToInt32(item["Document_Id"]),
+                                CustomerName = item["CustomerName"].ToString(),
+                                Box_Number = item["Box_Number"].ToString(),
+                                OperationType_Name = item["OperationType_Name"].ToString(),
+                                Stop_Number = Convert.ToInt32(item["Stop_Number"]),
+                                Creation_Date = item["Creation_Date"].ToString(),
+                                TMWOrder = item["TMWOrder"].ToString(),
+                                Status_Description = item["Status_Description"].ToString(),
+                                Inward = item["Inward"].ToString(),
+                                ACE = item["ACE"].ToString(),
+                                Layout = item["Layout"].ToString(),
+                                Accepted_By = item["Accepted_By"].ToString(),
+                                LayoutAccepteddtm = item["LayoutAccepteddtm"].ToString(),
+                                Consignment_Note = item["Consignment_Note"].ToString(),
+                                XML = item["XML"].ToString(),
+                                OriginalPDF = item["OriginalPDF"].ToString(),
+                                OperationsPDF = item["OperationsPDF"].ToString(),
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return sr;
+        }
+
+        #endregion
+
+        #region Tools
+
+        public static Result ResetPassword(ResetPassword _obj)
+        {
+            _obj.OldPassword = GetSHA256(_obj.OldPassword);
+            _obj.NewPassword = GetSHA256(_obj.NewPassword);
+            Result result = new Result();
+            //int spOption = 1;
+            using (var bl = new Business())
+            {
+                try
+                {
+                    bl
+                      //.AddParam("@SpOption", spOption)
+                      .AddParam("@Email", _obj.Email)
+                      .AddParam("@OldPassword", _obj.OldPassword)
+                      .AddParam("@NewPassword", _obj.NewPassword)
+                      .AddParam("@StatusOut", DBNull.Value, true, 100)
+                      .AddParam("@MessageOut", DBNull.Value, true, 300)
+                      .ProcedureQuery(Business.DBConn.ServidorLocal, "[Request].[ChangePassword]");
+
+                    if (bl.Exception != null)
+                    {
+                        result.State = 1;
+                        result.Message = bl.Exception;
+                    }
+                    else
+                    {
+                        result.State = Convert.ToInt32(bl.GetParamValue("@StatusOut"));
+                        result.Message = bl.GetParamValue("@MessageOut").ToString();
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    result.State = ex.State;
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
 
         #endregion
 

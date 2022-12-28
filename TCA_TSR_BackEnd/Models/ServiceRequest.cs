@@ -76,7 +76,6 @@
             public int Stops_Id { get; set; }
             public string User_Logged { get; set; }
         }
-
         public class UploadFile
         {
             public int ServiceRequest_Id { get; set; }
@@ -87,7 +86,6 @@
 
             public IFormFile DocumentFile { get; set; }
         }
-
         public class DownloadFile
         {
             public string Url { get; set; }
@@ -126,5 +124,68 @@
             public bool NotAccepted_LayoutDC { get; set; }
             public string User_Logged { get; set; }
         }
+        public class setPriority
+        {
+            public int ServiceRequest_Id { get; set; }
+            public bool Priority { get; set; }
+            public string User_Logged { get; set; }
+        }
+        public class updateBoxNumber
+        {
+            public int ServiceRequest_Id { get; set; }
+            public string Box_Number { get; set; }
+            public string User_Logged { get; set; }
+        }
+        public class updateOperationType
+        {
+            public int ServiceRequest_Id { get; set; }
+            public int OperationType_Id { get; set; }
+            public string User_Logged { get; set; }
+        }
+        public class ServiceReport
+        {
+            public int ServiceRequest_Id { get; set; }
+            public int Document_Id { get; set; }
+            public string CustomerName { get; set; }
+            public string Box_Number { get; set; }
+            public string OperationType_Name { get; set; }
+            public int Stop_Number { get; set; }
+            public string Creation_Date { get; set; }
+            public string TMWOrder { get; set; }
+            public string Status_Description { get; set; }
+            public string Inward { get; set; }
+            public string ACE { get; set; }
+            public string Layout { get; set; }
+            public string Accepted_By { get; set; }
+            public string LayoutAccepteddtm { get; set; }
+            public string Consignment_Note { get; set; }
+            public string XML { get; set; }
+            public string OriginalPDF { get; set; }
+            public string OperationsPDF { get; set; }
+
+        }
+
+        public class ServiceFilter
+        {
+            public int Status_Id { get; set; }
+            public int OperationType_Id { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
+            public int InvoiceNumber { get; set; }
+            public string Box_Number { get; set; }
+            public int Customer_Id { get; set; }
+            public bool Priority { get; set; }
+
+        }
+        public class ServiceReportFilter
+        {
+            public int Status_Id { get; set; }
+            public int OperationType_Id { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
+            public int InvoiceNumber { get; set; } //folio
+            public string Box_Number { get; set; }
+        }
+
     }
 }

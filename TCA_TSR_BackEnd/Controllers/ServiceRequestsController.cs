@@ -143,10 +143,10 @@ namespace TCA_TSR_BackEnd.Controllers
     
 
         // GET: api/<ServiceRequestsController>
-        [HttpGet("GetServiceRequests")]
-        public IActionResult Get()
+        [HttpGet("GetServiceRequests/{usid}")]
+        public IActionResult Get(int usid)
         {
-            List<ServiceRequest> sr = TCATSR_DAO.GetServiceRequests();
+            List<ServiceRequest> sr = TCATSR_DAO.GetServiceRequests(usid);
             if (sr != null)
             {
                 return Ok(sr);
@@ -159,8 +159,8 @@ namespace TCA_TSR_BackEnd.Controllers
             }
         }
 
-         [HttpGet("GetServiceRequestsFull/{srId}")]
-         public IActionResult GetSRFull(int srId)
+        [HttpGet("GetServiceRequestsFull/{srId}")]
+        public IActionResult GetSRFull(int srId)
          {
             List<ServiceRequest> sr = TCATSR_DAO.GetServiceRequestsFull(srId);
             if (sr != null)
@@ -175,6 +175,60 @@ namespace TCA_TSR_BackEnd.Controllers
             }
          }
 
+        // GET: api/<ServiceRequestsController>
+        [HttpGet("GetServiceReport")]
+        public IActionResult GetReport()
+        {
+            List<ServiceReport> sr = TCATSR_DAO.GetReport();
+            if (sr != null)
+            {
+                return Ok(sr);
+            }
+            else
+            {
+                Result result = new Result();
+                result.NumberRecords = 0;
+                return Ok(result);
+            }
+        }
+
+        // GET: api/<ServiceRequestsController>
+        [HttpPost("GetServiceRequestsFiltered")]
+        public IActionResult GetFiltered(ServiceFilter sf)
+        {
+            List<ServiceRequest> sr = TCATSR_DAO.GetServiceFilter(sf);
+            if (sr != null)
+            {
+                return Ok(sr);
+            }
+            else
+            {
+                Result result = new Result();
+                result.NumberRecords = 0;
+                result.Message = "Verifique el filtro de busqueda";
+                result.State = 1;
+                return Ok(result);
+            }
+        }
+
+        // GET: api/<ServiceRequestsController>
+        [HttpPost("GetServiceReportFiltered")]
+        public IActionResult GetReportFiltered(ServiceReportFilter sf)
+        {
+            List<ServiceReport> sr = TCATSR_DAO.GetServiceReportFilter(sf);
+            if (sr != null)
+            {
+                return Ok(sr);
+            }
+            else
+            {
+                Result result = new Result();
+                result.NumberRecords = 0;
+                result.Message = "Verifique el filtro de busqueda";
+                result.State = 1;
+                return Ok(result);
+            }
+        }
 
         // POST api/<ServiceRequestsController>
         [HttpPost("CreateServiceRequest")]
@@ -273,6 +327,78 @@ namespace TCA_TSR_BackEnd.Controllers
             if(lay.ServiceRequest_Id > 0 && lay.Document_Id > 0 && lay.User_Logged.Length > 0)
             {
                 result = TCATSR_DAO.SetLayoutStateDC(lay);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
+        }
+
+        //falta agregar userlogged
+        [HttpPut("RemoveServiceRequest/{id}")]
+        public IActionResult RemoveServiceRequest(int id)
+        {
+            Result result = new Result();
+            if (id > 0)
+            {
+                result = TCATSR_DAO.DeleteServiceRequest(id);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
+        }
+
+
+        [HttpPut("PrioritizeRequest")]
+        public IActionResult PrioritizeRequest(setPriority priority)
+        {
+            Result result = new Result();
+            if (priority.ServiceRequest_Id > 0 && priority.User_Logged.Length > 0)
+            {
+                result = TCATSR_DAO.setPriority(priority);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
+        }
+
+        [HttpPut("UpdateBoxNumber")]
+        public IActionResult UpdateBoxNumber(updateBoxNumber bn)
+        {
+
+            Result result = new Result();
+            if(bn.Box_Number.Length > 0 && bn.User_Logged.Length > 0 && bn.ServiceRequest_Id > 0)
+            {
+                result = TCATSR_DAO.updateBoxNumber(bn);
+                return Ok(result);
+            }
+            else
+            {
+                result.State = 1;
+                result.Message = "Verifique los datos";
+                return Ok();
+            }
+        }
+
+        [HttpPut("UpdateOperationType")]
+        public IActionResult UpdateOperationType(updateOperationType uopt)
+        {
+
+            Result result = new Result();
+            if (uopt.OperationType_Id > 0 && uopt.User_Logged.Length > 0 && uopt.ServiceRequest_Id > 0)
+            {
+                result = TCATSR_DAO.updateOperationType(uopt);
                 return Ok(result);
             }
             else
